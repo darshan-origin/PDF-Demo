@@ -33,4 +33,5 @@ struct FolderModel {
     let name: String
     let url: URL
     let size: Int64
+    let creationDate: Date?
 }

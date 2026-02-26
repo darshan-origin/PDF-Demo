@@ -501,12 +501,13 @@ public enum FileStorageManager {
             )
             
             let folders = directoryContents.compactMap { url -> FolderModel? in
-                guard let resourceValues = try? url.resourceValues(forKeys: [.isDirectoryKey]),
+                guard let resourceValues = try? url.resourceValues(forKeys: [.isDirectoryKey, .creationDateKey]),
                       resourceValues.isDirectory == true else {
                     return nil
                 }
                 
                 let size = folderSize(at: url)
+                let creationDate = resourceValues.creationDate
                 
                 Logger.print(
                     "Found Folder: \(url.lastPathComponent) | Size: \(size) bytes",
@@ -516,7 +517,8 @@ public enum FileStorageManager {
                 return FolderModel(
                     name: url.lastPathComponent,
                     url: url,
-                    size: size
+                    size: size,
+                    creationDate: creationDate
                 )
             }
             

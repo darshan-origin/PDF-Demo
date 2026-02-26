@@ -70,12 +70,7 @@ extension MyWorksVC {
                 let documentFolders = FileStorageManager.fetchFoldersFromDocumentDirectory()
                 
                 for folder in documentFolders {
-                    let folderModel = FolderModel(
-                        name: folder.name,
-                        url: folder.url,
-                        size: folder.size
-                    )
-                    tempItems.append(.folder(folderModel))
+                    tempItems.append(.folder(folder))
                 }
             }
             
@@ -330,7 +325,7 @@ extension MyWorksVC {
     }
     
     private func handleFilter(_ action: FilterAction) {
-        let folders = items.compactMap {
+        var folders = items.compactMap {
             if case .folder(let folder) = $0 { return folder }
             return nil
         }
@@ -343,6 +338,10 @@ extension MyWorksVC {
         switch action {
             
         case .createdDate:
+            folders.sort {
+                ($0.creationDate ?? .distantPast) >
+                ($1.creationDate ?? .distantPast)
+            }
             files.sort {
                 ($0.creationDate ?? .distantPast) >
                 ($1.creationDate ?? .distantPast)
@@ -350,18 +349,27 @@ extension MyWorksVC {
             Logger.print("Filter applied: Creation Date (Newest First)")
             
         case .az:
+            folders.sort {
+                $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
+            }
             files.sort {
                 $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
             }
             Logger.print("Filter applied: A - Z")
             
         case .za:
+            folders.sort {
+                $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedDescending
+            }
             files.sort {
                 $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedDescending
             }
             Logger.print("Filter applied: Z - A")
             
         case .size:
+            folders.sort {
+                $0.size > $1.size
+            }
             files.sort {
                 ($0.size ?? 0) > ($1.size ?? 0)
             }

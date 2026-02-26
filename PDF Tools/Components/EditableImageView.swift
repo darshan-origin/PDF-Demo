@@ -37,7 +37,7 @@ class EditableImageView: UIView {
     private let changeDateButton = UIButton(type: .custom)
     
     private let controlSize: CGFloat  = 22
-    private let touchTarget: CGFloat  = 33        // generous tap area
+    private let touchTarget: CGFloat  = 22        // generous tap area
     private let borderInset: CGFloat  = 11        // half of controlSize
     
     // MARK: - Private Properties — Gesture State
