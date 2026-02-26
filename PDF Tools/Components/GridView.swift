@@ -86,3 +86,4 @@ class GridView: UIView {
 // Worked on read any type of file.
 // Worked on file details info fetch.
 // Worked on face id to unlock app.
+// Worked on applying image filter and date editing.

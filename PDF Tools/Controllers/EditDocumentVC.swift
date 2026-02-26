@@ -1,6 +1,8 @@
 import UIKit
+import CoreImage
+import CropViewController
 
-class EditDocumentVC: UIViewController, UITextFieldDelegate, UIGestureRecognizerDelegate {
+class EditDocumentVC: UIViewController, UITextFieldDelegate, UIGestureRecognizerDelegate, EditableImageViewDelegate {
     
     @IBOutlet weak var view_topNav: UIView!
     @IBOutlet weak var view_bottomBase: UIView!
@@ -38,6 +40,39 @@ class EditDocumentVC: UIViewController, UITextFieldDelegate, UIGestureRecognizer
     private var bottomBaseOriginalConstant: CGFloat = 0
     private var editBaseOriginalConstant: CGFloat = 0
     
+    /// CIFilter name selected for the current page (nil = none). Applied on save.
+    private var pendingFilterName: String?
+    
+    // MARK: - Available CIFilters (grouped, display-friendly)
+    private let availableFilters: [(name: String, filterName: String)] = [
+        ("None",               ""),
+        ("Chrome",             "CIPhotoEffectChrome"),
+        ("Fade",               "CIPhotoEffectFade"),
+        ("Instant",            "CIPhotoEffectInstant"),
+        ("Mono",               "CIPhotoEffectMono"),
+        ("Noir",               "CIPhotoEffectNoir"),
+        ("Process",            "CIPhotoEffectProcess"),
+        ("Tonal",              "CIPhotoEffectTonal"),
+        ("Transfer",           "CIPhotoEffectTransfer"),
+        ("Sepia",              "CISepiaTone"),
+        ("Vignette",           "CIVignette"),
+        ("Bloom",              "CIBloom"),
+        ("Gloom",              "CIGloom"),
+        ("Sharpen",            "CISharpenLuminance"),
+        ("Unsharp Mask",       "CIUnsharpMask"),
+        ("Invert",             "CIColorInvert"),
+        ("Grayscale",          "CIColorMonochrome"),
+        ("Posterize",          "CIColorPosterize"),
+        ("Vibrance",           "CIVibrance"),
+        ("Temperature Warm",   "CITemperatureAndTint"),
+        ("Crystallize",        "CICrystallize"),
+        ("Pixellate",          "CIPixellate"),
+        ("Pointillize",        "CIPointillize"),
+        ("Edges",              "CIEdges"),
+        ("Comic",              "CIComicEffect"),
+        ("X-Ray",              "CIXRay")
+    ]
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -60,7 +95,8 @@ class EditDocumentVC: UIViewController, UITextFieldDelegate, UIGestureRecognizer
     }
     
     @IBAction func onTapped_save(_ sender: Any) {
-        mergeOverlaysForCurrentImage()  // <-- Merge before exiting edit mode
+        applyPendingFilter()                    // Commit selected CIFilter to the image
+        mergeOverlaysForCurrentImage()          // Merge overlays on top
         hideBaseBottomViews(toView: view_editBase)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { [self] in
             showBaseBottomViews(toView: view_bottomBase)
@@ -334,7 +370,8 @@ extension EditDocumentVC: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if collectionView == collectionview_effectFeatures {
-            if indexPath.row == 0 {
+            switch indexPath.row {
+            case 0:
                 AlertHelper.shared.show(
                     on: self,
                     title: "Add Signature",
@@ -346,6 +383,14 @@ extension EditDocumentVC: UICollectionViewDelegateFlowLayout {
                         ("Cancel", .cancel, nil)
                     ]
                 )
+            case 1:
+                openCropScreen()
+            case 2:
+                showFilterActionSheet()
+            case 3:
+                addDateOverlay()
+            default:
+                break
             }
         }
     }
@@ -394,6 +439,139 @@ extension EditDocumentVC {
     }
 }
 
+// MARK: - CIFilter Integration
+
+extension EditDocumentVC {
+    
+    func showFilterActionSheet() {
+        guard !arrFinalEditableImages.isEmpty else { return }
+        
+        let alert = UIAlertController(
+            title: "Choose Effect",
+            message: "Select a filter to preview. Tap Save to apply.",
+            preferredStyle: .actionSheet
+        )
+        
+        for filter in availableFilters {
+            let action = UIAlertAction(title: filter.name, style: .default) { [weak self] _ in
+                guard let self = self else { return }
+                if filter.filterName.isEmpty {
+                    self.pendingFilterName = nil
+                    self.revertCellToOriginal()
+                } else {
+                    self.pendingFilterName = filter.filterName
+                    self.previewFilter(named: filter.filterName)
+                }
+            }
+            alert.addAction(action)
+        }
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel) { [weak self] _ in
+            self?.pendingFilterName = nil
+            self?.revertCellToOriginal()
+        })
+        
+        if let popover = alert.popoverPresentationController {
+            popover.sourceView = view
+            popover.sourceRect = CGRect(x: view.bounds.midX, y: view.bounds.midY, width: 0, height: 0)
+            popover.permittedArrowDirections = []
+        }
+        
+        present(alert, animated: true)
+    }
+    
+    private func previewFilter(named filterName: String) {
+        guard !arrFinalEditableImages.isEmpty,
+              let cell = collectionview_passedImages.cellForItem(
+                at: IndexPath(item: currentCount, section: 0)
+              ) as? cellEditDoc else { return }
+        
+        let original = arrFinalEditableImages[currentCount]
+        if let filtered = applyFilter(named: filterName, to: original) {
+            cell.img_editableFullImage.image = filtered
+        }
+    }
+    
+    private func revertCellToOriginal() {
+        guard !arrFinalEditableImages.isEmpty,
+              let cell = collectionview_passedImages.cellForItem(
+                at: IndexPath(item: currentCount, section: 0)
+              ) as? cellEditDoc else { return }
+        cell.img_editableFullImage.image = arrFinalEditableImages[currentCount]
+    }
+    
+    func applyPendingFilter() {
+        guard let filterName = pendingFilterName,
+              !filterName.isEmpty,
+              !arrFinalEditableImages.isEmpty else {
+            pendingFilterName = nil
+            return
+        }
+        
+        let original = arrFinalEditableImages[currentCount]
+        if let filtered = applyFilter(named: filterName, to: original) {
+            arrFinalEditableImages[currentCount] = filtered
+            
+            if let cell = collectionview_passedImages.cellForItem(
+                at: IndexPath(item: currentCount, section: 0)
+            ) as? cellEditDoc {
+                cell.img_editableFullImage.image = filtered
+            }
+        }
+        pendingFilterName = nil
+    }
+    
+    private func applyFilter(named filterName: String, to image: UIImage) -> UIImage? {
+        guard let cgImage = image.cgImage else { return nil }
+        
+        let ciImage = CIImage(cgImage: cgImage)
+        let context = CIContext(options: [.useSoftwareRenderer: false])
+        
+        guard let filter = CIFilter(name: filterName) else { return nil }
+        filter.setValue(ciImage, forKey: kCIInputImageKey)
+        
+        switch filterName {
+        case "CISepiaTone":
+            filter.setValue(0.85, forKey: kCIInputIntensityKey)
+        case "CIVignette":
+            filter.setValue(1.2, forKey: kCIInputIntensityKey)
+            filter.setValue(1.5, forKey: kCIInputRadiusKey)
+        case "CIBloom", "CIGloom":
+            filter.setValue(0.8, forKey: kCIInputIntensityKey)
+            filter.setValue(10.0, forKey: kCIInputRadiusKey)
+        case "CISharpenLuminance":
+            filter.setValue(0.8, forKey: kCIInputSharpnessKey)
+        case "CIUnsharpMask":
+            filter.setValue(2.5, forKey: kCIInputRadiusKey)
+            filter.setValue(0.5, forKey: kCIInputIntensityKey)
+        case "CIColorMonochrome":
+            filter.setValue(CIColor(color: .gray), forKey: kCIInputColorKey)
+            filter.setValue(1.0, forKey: kCIInputIntensityKey)
+        case "CIColorPosterize":
+            filter.setValue(6.0, forKey: "inputLevels")
+        case "CIVibrance":
+            filter.setValue(0.8, forKey: "inputAmount")
+        case "CITemperatureAndTint":
+            filter.setValue(CIVector(x: 7000, y: 0), forKey: "inputNeutral")
+            filter.setValue(CIVector(x: 6500, y: 0), forKey: "inputTargetNeutral")
+        case "CICrystallize":
+            filter.setValue(20.0, forKey: kCIInputRadiusKey)
+        case "CIPixellate":
+            filter.setValue(12.0, forKey: kCIInputScaleKey)
+        case "CIPointillize":
+            filter.setValue(12.0, forKey: kCIInputRadiusKey)
+        case "CIEdges":
+            filter.setValue(5.0, forKey: kCIInputIntensityKey)
+        default:
+            break
+        }
+        
+        guard let output = filter.outputImage,
+              let cgOut = context.createCGImage(output, from: ciImage.extent) else { return nil }
+        
+        return UIImage(cgImage: cgOut, scale: image.scale, orientation: image.imageOrientation)
+    }
+}
 
 extension EditDocumentVC: SecondaryViewControllerDelegate {
     
@@ -416,7 +594,6 @@ extension EditDocumentVC: SecondaryViewControllerDelegate {
             
             guard baseFrame!.width > 0, baseFrame!.height > 0 else { return }
             
-            // Small initial size (15%)
             let width = max(baseFrame!.width * 0.15, 40)
             let aspectRatio = image.size.height / max(image.size.width, 1)
             let height = max(width * aspectRatio, 40)
@@ -431,16 +608,105 @@ extension EditDocumentVC: SecondaryViewControllerDelegate {
             container.delegate = self
             container.imageView.image = image
             
-            // Add tap to baseView to deselect
             if baseView?.gestureRecognizers?.filter({ $0 is UITapGestureRecognizer }).isEmpty ?? true {
                 let baseTap = UITapGestureRecognizer(target: self, action: #selector(self.deselectAllOverlays))
                 baseView?.addGestureRecognizer(baseTap)
             }
-
+            
             baseView!.addSubview(container)
             self.overlayImageViews.append(container)
             self.selectOverlay(container)
         }
+    }
+    
+    private func addDateOverlay() {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd/MM/yyyy"
+        let dateString = formatter.string(from: Date())
+        
+        guard let dateImage = imageFromText(dateString, font: UIFont.boldSystemFont(ofSize: 40), color: .black) else { return }
+        
+        let currentIndexPath = IndexPath(item: currentCount, section: 0)
+        collectionview_passedImages.scrollToItem(at: currentIndexPath, at: .centeredHorizontally, animated: false)
+        collectionview_passedImages.layoutIfNeeded()
+        
+        guard let cell = collectionview_passedImages.cellForItem(at: currentIndexPath) as? cellEditDoc,
+              let baseView = cell.img_editableFullImage else { return }
+        
+        let baseFrame = baseView.bounds
+        let width = max(baseFrame.width * 0.4, 150)
+        let aspectRatio = dateImage.size.height / max(dateImage.size.width, 1)
+        let height = width * aspectRatio
+        
+        let container = EditableImageView(frame: CGRect(
+            x: baseFrame.midX - (width + 24) / 2,
+            y: baseFrame.midY - (height + 24) / 2,
+            width: width + 24,
+            height: height + 24
+        ))
+        
+        container.editMode = .date
+        container.delegate = self
+        container.imageView.image = dateImage
+        
+        container.onDateChangeTapped = { [weak self, weak container] in
+            guard let self = self, let container = container else { return }
+            self.showDatePicker(for: container)
+        }
+        
+        if baseView.gestureRecognizers?.filter({ $0 is UITapGestureRecognizer }).isEmpty ?? true {
+            let baseTap = UITapGestureRecognizer(target: self, action: #selector(self.deselectAllOverlays))
+            baseView.addGestureRecognizer(baseTap)
+        }
+        
+        baseView.addSubview(container)
+        self.overlayImageViews.append(container)
+        self.selectOverlay(container)
+    }
+    
+    private func showDatePicker(for overlay: EditableImageView) {
+        let datePicker = UIDatePicker()
+        datePicker.datePickerMode = .date
+        datePicker.preferredDatePickerStyle = .wheels
+        
+        let alert = UIAlertController(title: "Select Date", message: "\n\n\n\n\n\n\n\n\n", preferredStyle: .alert)
+        alert.view.addSubview(datePicker)
+        
+        datePicker.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            datePicker.centerXAnchor.constraint(equalTo: alert.view.centerXAnchor),
+            datePicker.topAnchor.constraint(equalTo: alert.view.topAnchor, constant: 45),
+            datePicker.widthAnchor.constraint(equalTo: alert.view.widthAnchor)
+        ])
+        
+        alert.addAction(UIAlertAction(title: "Update", style: .default) { _ in
+            let formatter = DateFormatter()
+            formatter.dateFormat = "dd/MM/yyyy"
+            let dateString = formatter.string(from: datePicker.date)
+            
+            if let newImage = self.imageFromText(dateString, font: UIFont.boldSystemFont(ofSize: 40), color: .black) {
+                overlay.imageView.image = newImage
+            }
+        })
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        
+        present(alert, animated: true)
+    }
+    
+    private func imageFromText(_ text: String, font: UIFont, color: UIColor) -> UIImage? {
+        let attributes: [NSAttributedString.Key: Any] = [
+            .font: font,
+            .foregroundColor: color
+        ]
+        let size = text.size(withAttributes: attributes)
+        
+        UIGraphicsBeginImageContextWithOptions(size, false, 0)
+        text.draw(at: .zero, withAttributes: attributes)
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        return image
     }
     
     @objc private func deselectAllOverlays() {
@@ -469,35 +735,6 @@ extension EditDocumentVC: SecondaryViewControllerDelegate {
         }
     }
     
-    // MARK: - Remove Overlay
-    
-    @objc private func removeOverlay(_ sender: UIButton) {
-        // This is now handled by EditableImageViewDelegate
-    }
-    
-    
-    // MARK: - Gestures (Legacy - replaced by EditableImageView internal handling)
-    
-    private func addGestures(to view: UIView) {
-        // Legacy
-    }
-    
-    
-    @objc private func handlePan(_ gesture: UIPanGestureRecognizer) {
-        // Legacy
-    }
-    
-    
-    @objc private func handlePinch(_ gesture: UIPinchGestureRecognizer) {
-        // Legacy
-    }
-    
-    
-    @objc private func handleRotation(_ gesture: UIRotationGestureRecognizer) {
-        // Legacy
-    }
-    
-    
     // MARK: - Merge
     
     private func mergeOverlaysForCurrentImage() {
@@ -509,8 +746,8 @@ extension EditDocumentVC: SecondaryViewControllerDelegate {
         
         let imageView = cell.img_editableFullImage
         
-        // Hide selection controls before rendering
         deselectAllOverlays()
+        overlayImageViews.forEach { $0.hideControls() }
         
         let renderer = UIGraphicsImageRenderer(size: (imageView?.bounds.size)!)
         let mergedImage = renderer.image { ctx in
@@ -521,11 +758,10 @@ extension EditDocumentVC: SecondaryViewControllerDelegate {
         imageView?.image = mergedImage
         imageView?.transform = .identity
         
+        overlayImageViews.forEach { $0.removeFromSuperview() }
         overlayImageViews.removeAll()
     }
 }
-
-extension EditDocumentVC: EditableImageViewDelegate {}
 
 extension EditDocumentVC {
     func callNotificationFallbacks() {
@@ -542,6 +778,26 @@ extension EditDocumentVC {
         Logger.print("Received PDF URL: >>>>>> \(fileURL)", level: .success)
         
         NavigationManager.shared.navigateToPDFViewVC(from: self, url: "\(fileURL)")
+    }
+}
+
+extension EditDocumentVC: CropViewControllerDelegate {
+    
+    func openCropScreen() {
+        guard !arrFinalEditableImages.isEmpty else { return }
+        let image = arrFinalEditableImages[currentCount]
+        let cropVC = CropViewController(image: image)
+        cropVC.delegate = self
+        present(cropVC, animated: true)
+    }
+    
+    func cropViewController(_ cropViewController: CropViewController, didCropToImage image: UIImage, withRect cropRect: CGRect, angle: Int) {
+        dismiss(animated: true)
+        arrFinalEditableImages[currentCount] = image
+        
+        if let cell = collectionview_passedImages.cellForItem(at: IndexPath(item: currentCount, section: 0)) as? cellEditDoc {
+            cell.img_editableFullImage.image = image
+        }
     }
 }
 

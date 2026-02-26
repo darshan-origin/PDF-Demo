@@ -83,8 +83,6 @@ class CameraHandlerVC: UIViewController, UIImagePickerControllerDelegate, UINavi
         self.navigateToCropDocVC(img: nil, imgs: selectedImages, from: self)
     }
     
-    
-    
     deinit {
         self.captureSession?.stopRunning()
     }
