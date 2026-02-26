@@ -1,0 +1,732 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0404B98F2F48617A00312E6E /* SelectedDocViewerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0404B98E2F48617A00312E6E /* SelectedDocViewerVC.swift */; };
+		0404B9922F4883BF00312E6E /* CoreXLSX in Frameworks */ = {isa = PBXBuildFile; productRef = 0404B9912F4883BF00312E6E /* CoreXLSX */; };
+		040B74862F45DA4600C3EBF1 /* cellEffectsFeatures.xib in Resources */ = {isa = PBXBuildFile; fileRef = 040B74852F45DA4600C3EBF1 /* cellEffectsFeatures.xib */; };
+		040B74872F45DA4600C3EBF1 /* cellEffectsFeatures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 040B74842F45DA4600C3EBF1 /* cellEffectsFeatures.swift */; };
+		040B74892F45E2D000C3EBF1 /* AlertHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 040B74882F45E2CB00C3EBF1 /* AlertHelper.swift */; };
+		040B748B2F45E5AC00C3EBF1 /* SignatureManageVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 040B748A2F45E5AC00C3EBF1 /* SignatureManageVC.swift */; };
+		041043A42F4C07950092B577 /* WebViewVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 041043A32F4C07950092B577 /* WebViewVC.swift */; };
+		041F33FA2F4487DF00A7F1DB /* CropDocumentVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 041F33F92F4487DF00A7F1DB /* CropDocumentVC.swift */; };
+		04251FD12F4EA8E3000B6317 /* PDFProtectionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04251FD02F4EA8E2000B6317 /* PDFProtectionManager.swift */; };
+		04251FD32F4EEC9A000B6317 /* CommonImageViewerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04251FD22F4EEC9A000B6317 /* CommonImageViewerVC.swift */; };
+		044F63342F45707D00F4B9AF /* UIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 044F63332F45707A00F4B9AF /* UIView.swift */; };
+		044F63362F45767F00F4B9AF /* CommonBoolean.swift in Sources */ = {isa = PBXBuildFile; fileRef = 044F63352F45766B00F4B9AF /* CommonBoolean.swift */; };
+		0450990C2F4FF9A800F17F5F /* MarkTagVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0450990B2F4FF9A800F17F5F /* MarkTagVC.swift */; };
+		045099102F50087900F17F5F /* DocReaderVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0450990F2F50087900F17F5F /* DocReaderVC.swift */; };
+		045099122F5018DD00F17F5F /* FileInfoVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045099112F5018DD00F17F5F /* FileInfoVC.swift */; };
+		0457B1B92F46C2A000D5F835 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0457B1B82F46C2A000D5F835 /* Assets.xcassets */; };
+		0457B1BC2F46C73A00D5F835 /* UIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0457B1BB2F46C73800D5F835 /* UIViewController.swift */; };
+		0457B1BE2F46D52100D5F835 /* EditableImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0457B1BD2F46D52000D5F835 /* EditableImageView.swift */; };
+		0457B1C22F46D96400D5F835 /* DocumentGenSuccessVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0457B1C12F46D96400D5F835 /* DocumentGenSuccessVC.swift */; };
+		0457B1C42F46DA7200D5F835 /* DOCHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0457B1C32F46DA6C00D5F835 /* DOCHelper.swift */; };
+		047BB9012F480E5000731570 /* MergeVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047BB9002F480E5000731570 /* MergeVC.swift */; };
+		047BB9032F481DF800731570 /* cellAllFilesPDFs.xib in Resources */ = {isa = PBXBuildFile; fileRef = 047BB9022F481DF800731570 /* cellAllFilesPDFs.xib */; };
+		047BB9052F481E0800731570 /* cellAllFilesPDFs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047BB9042F481E0800731570 /* cellAllFilesPDFs.swift */; };
+		047BB9072F48423100731570 /* Enum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047BB9062F48422E00731570 /* Enum.swift */; };
+		047BB9092F48581800731570 /* MailHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047BB9082F48581100731570 /* MailHelper.swift */; };
+		047BB90B2F485DEB00731570 /* DocumentPickerHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047BB90A2F485DEB00731570 /* DocumentPickerHelper.swift */; };
+		0490384E2F44456800BB207E /* CameraHandlerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0490384D2F44456800BB207E /* CameraHandlerVC.swift */; };
+		049038572F4445D100BB207E /* NavigationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049038562F4445CB00BB207E /* NavigationManager.swift */; };
+		049038592F44492900BB207E /* PermissionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049038582F44492000BB207E /* PermissionManager.swift */; };
+		0490385B2F444A3400BB207E /* LogsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0490385A2F444A3000BB207E /* LogsManager.swift */; };
+		0490385E2F444B5300BB207E /* GridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0490385D2F444B5000BB207E /* GridView.swift */; };
+		049038602F444C2100BB207E /* ThreadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0490385F2F444C1E00BB207E /* ThreadManager.swift */; };
+		049038652F444D1D00BB207E /* cellCameraFeatures.xib in Resources */ = {isa = PBXBuildFile; fileRef = 049038642F444D1D00BB207E /* cellCameraFeatures.xib */; };
+		049038662F444D1D00BB207E /* cellCameraFeatures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049038632F444D1D00BB207E /* cellCameraFeatures.swift */; };
+		049038692F444D9000BB207E /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049038682F444D8F00BB207E /* Model.swift */; };
+		0490386E2F445C9F00BB207E /* UILabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0490386D2F445C9B00BB207E /* UILabel.swift */; };
+		04A12CD62F46EB19000BAAE4 /* FileStorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04A12CD52F46EB12000BAAE4 /* FileStorageManager.swift */; };
+		04A12CD82F46F54C000BAAE4 /* NotificationNames.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04A12CD72F46F544000BAAE4 /* NotificationNames.swift */; };
+		04A12CDA2F470263000BAAE4 /* PDFViewVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04A12CD92F470263000BAAE4 /* PDFViewVC.swift */; };
+		04A12CDC2F470448000BAAE4 /* TabVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04A12CDB2F470448000BAAE4 /* TabVC.swift */; };
+		04A12CDE2F47051F000BAAE4 /* MyWorksVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04A12CDD2F47051F000BAAE4 /* MyWorksVC.swift */; };
+		04A12CE52F471648000BAAE4 /* cellAllFiles.xib in Resources */ = {isa = PBXBuildFile; fileRef = 04A12CE42F471648000BAAE4 /* cellAllFiles.xib */; };
+		04A12CE62F471648000BAAE4 /* cellAllFiles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04A12CE32F471648000BAAE4 /* cellAllFiles.swift */; };
+		04A9AA0C2F444330005CDB50 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 04A9AA052F444330005CDB50 /* LaunchScreen.storyboard */; };
+		04A9AA0D2F444330005CDB50 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 04A9AA072F444330005CDB50 /* Main.storyboard */; };
+		04A9AA0F2F444330005CDB50 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04A9A9FD2F444330005CDB50 /* AppDelegate.swift */; };
+		04A9AA102F444330005CDB50 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04A9A9FE2F444330005CDB50 /* SceneDelegate.swift */; };
+		04A9AA132F4443D3005CDB50 /* HomeVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04A9AA122F4443D3005CDB50 /* HomeVC.swift */; };
+		04AF75762F4C15DF001801D6 /* PreviewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04AF75752F4C15DD001801D6 /* PreviewManager.swift */; };
+		04AF757A2F4C1A65001801D6 /* WebViewPDFDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04AF75792F4C1A62001801D6 /* WebViewPDFDelegate.swift */; };
+		04AF75832F4C5E3A001801D6 /* PDFCompressorKit in Frameworks */ = {isa = PBXBuildFile; productRef = 04AF75822F4C5E3A001801D6 /* PDFCompressorKit */; };
+		04B23FA12F4583090023F8E3 /* CropViewController in Frameworks */ = {isa = PBXBuildFile; productRef = 04B23FA02F4583090023F8E3 /* CropViewController */; };
+		04B23FA32F4583090023F8E3 /* TOCropViewController in Frameworks */ = {isa = PBXBuildFile; productRef = 04B23FA22F4583090023F8E3 /* TOCropViewController */; };
+		04B23FA52F4596CD0023F8E3 /* EditDocumentVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04B23FA42F4596CD0023F8E3 /* EditDocumentVC.swift */; };
+		04B23FA92F459D710023F8E3 /* UITextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04B23FA82F459D710023F8E3 /* UITextField.swift */; };
+		04B23FAE2F45A41C0023F8E3 /* cellEditDoc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04B23FAC2F45A41C0023F8E3 /* cellEditDoc.swift */; };
+		04B23FAF2F45A41C0023F8E3 /* cellEditDoc.xib in Resources */ = {isa = PBXBuildFile; fileRef = 04B23FAD2F45A41C0023F8E3 /* cellEditDoc.xib */; };
+		04F00F1A2F45ADD900D8338A /* UIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04F00F192F45ADD800D8338A /* UIImage.swift */; };
+		04F00F1C2F45B3CE00D8338A /* ExportDocumentPopupVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04F00F1B2F45B3CE00D8338A /* ExportDocumentPopupVC.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		0404B98E2F48617A00312E6E /* SelectedDocViewerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectedDocViewerVC.swift; sourceTree = "<group>"; };
+		040B74842F45DA4600C3EBF1 /* cellEffectsFeatures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = cellEffectsFeatures.swift; sourceTree = "<group>"; };
+		040B74852F45DA4600C3EBF1 /* cellEffectsFeatures.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = cellEffectsFeatures.xib; sourceTree = "<group>"; };
+		040B74882F45E2CB00C3EBF1 /* AlertHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertHelper.swift; sourceTree = "<group>"; };
+		040B748A2F45E5AC00C3EBF1 /* SignatureManageVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignatureManageVC.swift; sourceTree = "<group>"; };
+		041043A32F4C07950092B577 /* WebViewVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewVC.swift; sourceTree = "<group>"; };
+		041F33F92F4487DF00A7F1DB /* CropDocumentVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CropDocumentVC.swift; sourceTree = "<group>"; };
+		04251FD02F4EA8E2000B6317 /* PDFProtectionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFProtectionManager.swift; sourceTree = "<group>"; };
+		04251FD22F4EEC9A000B6317 /* CommonImageViewerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonImageViewerVC.swift; sourceTree = "<group>"; };
+		044F63332F45707A00F4B9AF /* UIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIView.swift; sourceTree = "<group>"; };
+		044F63352F45766B00F4B9AF /* CommonBoolean.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonBoolean.swift; sourceTree = "<group>"; };
+		0450990B2F4FF9A800F17F5F /* MarkTagVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkTagVC.swift; sourceTree = "<group>"; };
+		0450990F2F50087900F17F5F /* DocReaderVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocReaderVC.swift; sourceTree = "<group>"; };
+		045099112F5018DD00F17F5F /* FileInfoVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileInfoVC.swift; sourceTree = "<group>"; };
+		0457B1B82F46C2A000D5F835 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		0457B1BB2F46C73800D5F835 /* UIViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewController.swift; sourceTree = "<group>"; };
+		0457B1BD2F46D52000D5F835 /* EditableImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditableImageView.swift; sourceTree = "<group>"; };
+		0457B1C12F46D96400D5F835 /* DocumentGenSuccessVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentGenSuccessVC.swift; sourceTree = "<group>"; };
+		0457B1C32F46DA6C00D5F835 /* DOCHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DOCHelper.swift; sourceTree = "<group>"; };
+		047BB9002F480E5000731570 /* MergeVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MergeVC.swift; sourceTree = "<group>"; };
+		047BB9022F481DF800731570 /* cellAllFilesPDFs.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = cellAllFilesPDFs.xib; sourceTree = "<group>"; };
+		047BB9042F481E0800731570 /* cellAllFilesPDFs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = cellAllFilesPDFs.swift; sourceTree = "<group>"; };
+		047BB9062F48422E00731570 /* Enum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enum.swift; sourceTree = "<group>"; };
+		047BB9082F48581100731570 /* MailHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailHelper.swift; sourceTree = "<group>"; };
+		047BB90A2F485DEB00731570 /* DocumentPickerHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentPickerHelper.swift; sourceTree = "<group>"; };
+		0490384D2F44456800BB207E /* CameraHandlerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraHandlerVC.swift; sourceTree = "<group>"; };
+		049038562F4445CB00BB207E /* NavigationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationManager.swift; sourceTree = "<group>"; };
+		049038582F44492000BB207E /* PermissionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionManager.swift; sourceTree = "<group>"; };
+		0490385A2F444A3000BB207E /* LogsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogsManager.swift; sourceTree = "<group>"; };
+		0490385D2F444B5000BB207E /* GridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GridView.swift; sourceTree = "<group>"; };
+		0490385F2F444C1E00BB207E /* ThreadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadManager.swift; sourceTree = "<group>"; };
+		049038632F444D1D00BB207E /* cellCameraFeatures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = cellCameraFeatures.swift; sourceTree = "<group>"; };
+		049038642F444D1D00BB207E /* cellCameraFeatures.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = cellCameraFeatures.xib; sourceTree = "<group>"; };
+		049038682F444D8F00BB207E /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
+		0490386D2F445C9B00BB207E /* UILabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UILabel.swift; sourceTree = "<group>"; };
+		04A12CD52F46EB12000BAAE4 /* FileStorageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileStorageManager.swift; sourceTree = "<group>"; };
+		04A12CD72F46F544000BAAE4 /* NotificationNames.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationNames.swift; sourceTree = "<group>"; };
+		04A12CD92F470263000BAAE4 /* PDFViewVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFViewVC.swift; sourceTree = "<group>"; };
+		04A12CDB2F470448000BAAE4 /* TabVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabVC.swift; sourceTree = "<group>"; };
+		04A12CDD2F47051F000BAAE4 /* MyWorksVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyWorksVC.swift; sourceTree = "<group>"; };
+		04A12CE32F471648000BAAE4 /* cellAllFiles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = cellAllFiles.swift; sourceTree = "<group>"; };
+		04A12CE42F471648000BAAE4 /* cellAllFiles.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = cellAllFiles.xib; sourceTree = "<group>"; };
+		04A9A9E12F4442F2005CDB50 /* PDF Tools.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "PDF Tools.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		04A9A9FD2F444330005CDB50 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		04A9A9FE2F444330005CDB50 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		04A9AA042F444330005CDB50 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		04A9AA062F444330005CDB50 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		04A9AA092F444330005CDB50 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		04A9AA122F4443D3005CDB50 /* HomeVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeVC.swift; sourceTree = "<group>"; };
+		04AF75752F4C15DD001801D6 /* PreviewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewManager.swift; sourceTree = "<group>"; };
+		04AF75792F4C1A62001801D6 /* WebViewPDFDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewPDFDelegate.swift; sourceTree = "<group>"; };
+		04B23FA42F4596CD0023F8E3 /* EditDocumentVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditDocumentVC.swift; sourceTree = "<group>"; };
+		04B23FA82F459D710023F8E3 /* UITextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITextField.swift; sourceTree = "<group>"; };
+		04B23FAC2F45A41C0023F8E3 /* cellEditDoc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = cellEditDoc.swift; sourceTree = "<group>"; };
+		04B23FAD2F45A41C0023F8E3 /* cellEditDoc.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = cellEditDoc.xib; sourceTree = "<group>"; };
+		04F00F192F45ADD800D8338A /* UIImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImage.swift; sourceTree = "<group>"; };
+		04F00F1B2F45B3CE00D8338A /* ExportDocumentPopupVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportDocumentPopupVC.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		04A9A9DE2F4442F2005CDB50 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0404B9922F4883BF00312E6E /* CoreXLSX in Frameworks */,
+				04B23FA32F4583090023F8E3 /* TOCropViewController in Frameworks */,
+				04B23FA12F4583090023F8E3 /* CropViewController in Frameworks */,
+				04AF75832F4C5E3A001801D6 /* PDFCompressorKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0457B1BA2F46C2A600D5F835 /* Resorces */ = {
+			isa = PBXGroup;
+			children = (
+				0457B1B82F46C2A000D5F835 /* Assets.xcassets */,
+			);
+			path = Resorces;
+			sourceTree = "<group>";
+		};
+		049038502F44458A00BB207E /* Helper */ = {
+			isa = PBXGroup;
+			children = (
+				040B74882F45E2CB00C3EBF1 /* AlertHelper.swift */,
+				044F63352F45766B00F4B9AF /* CommonBoolean.swift */,
+				0457B1C32F46DA6C00D5F835 /* DOCHelper.swift */,
+				04251FD02F4EA8E2000B6317 /* PDFProtectionManager.swift */,
+				04AF75792F4C1A62001801D6 /* WebViewPDFDelegate.swift */,
+				047BB90A2F485DEB00731570 /* DocumentPickerHelper.swift */,
+				0490386C2F445C9400BB207E /* Extention */,
+				04A12CD52F46EB12000BAAE4 /* FileStorageManager.swift */,
+				0490385A2F444A3000BB207E /* LogsManager.swift */,
+				047BB9082F48581100731570 /* MailHelper.swift */,
+				049038562F4445CB00BB207E /* NavigationManager.swift */,
+				04A12CD72F46F544000BAAE4 /* NotificationNames.swift */,
+				049038582F44492000BB207E /* PermissionManager.swift */,
+				0490385F2F444C1E00BB207E /* ThreadManager.swift */,
+				04AF75752F4C15DD001801D6 /* PreviewManager.swift */,
+			);
+			path = Helper;
+			sourceTree = "<group>";
+		};
+		0490385C2F444B3E00BB207E /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				0490385D2F444B5000BB207E /* GridView.swift */,
+				0457B1BD2F46D52000D5F835 /* EditableImageView.swift */,
+				04251FD22F4EEC9A000B6317 /* CommonImageViewerVC.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		049038612F444CF300BB207E /* Xibs */ = {
+			isa = PBXGroup;
+			children = (
+				049038622F444CF800BB207E /* Cell */,
+			);
+			path = Xibs;
+			sourceTree = "<group>";
+		};
+		049038622F444CF800BB207E /* Cell */ = {
+			isa = PBXGroup;
+			children = (
+				049038632F444D1D00BB207E /* cellCameraFeatures.swift */,
+				049038642F444D1D00BB207E /* cellCameraFeatures.xib */,
+				04B23FAC2F45A41C0023F8E3 /* cellEditDoc.swift */,
+				040B74842F45DA4600C3EBF1 /* cellEffectsFeatures.swift */,
+				040B74852F45DA4600C3EBF1 /* cellEffectsFeatures.xib */,
+				04B23FAD2F45A41C0023F8E3 /* cellEditDoc.xib */,
+				04A12CE32F471648000BAAE4 /* cellAllFiles.swift */,
+				04A12CE42F471648000BAAE4 /* cellAllFiles.xib */,
+				047BB9042F481E0800731570 /* cellAllFilesPDFs.swift */,
+				047BB9022F481DF800731570 /* cellAllFilesPDFs.xib */,
+			);
+			path = Cell;
+			sourceTree = "<group>";
+		};
+		049038672F444D8700BB207E /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				049038682F444D8F00BB207E /* Model.swift */,
+				047BB9062F48422E00731570 /* Enum.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		0490386C2F445C9400BB207E /* Extention */ = {
+			isa = PBXGroup;
+			children = (
+				0457B1BB2F46C73800D5F835 /* UIViewController.swift */,
+				0490386D2F445C9B00BB207E /* UILabel.swift */,
+				044F63332F45707A00F4B9AF /* UIView.swift */,
+				04B23FA82F459D710023F8E3 /* UITextField.swift */,
+				04F00F192F45ADD800D8338A /* UIImage.swift */,
+			);
+			path = Extention;
+			sourceTree = "<group>";
+		};
+		04A9A9D82F4442F2005CDB50 = {
+			isa = PBXGroup;
+			children = (
+				04A9AA0A2F444330005CDB50 /* PDF Tools */,
+				04A9A9E22F4442F2005CDB50 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		04A9A9E22F4442F2005CDB50 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				04A9A9E12F4442F2005CDB50 /* PDF Tools.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		04A9A9FF2F444330005CDB50 /* AppConfig */ = {
+			isa = PBXGroup;
+			children = (
+				04A9A9FD2F444330005CDB50 /* AppDelegate.swift */,
+				04A9A9FE2F444330005CDB50 /* SceneDelegate.swift */,
+			);
+			path = AppConfig;
+			sourceTree = "<group>";
+		};
+		04A9AA012F444330005CDB50 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				0490384D2F44456800BB207E /* CameraHandlerVC.swift */,
+				041F33F92F4487DF00A7F1DB /* CropDocumentVC.swift */,
+				0457B1C12F46D96400D5F835 /* DocumentGenSuccessVC.swift */,
+				04B23FA42F4596CD0023F8E3 /* EditDocumentVC.swift */,
+				04F00F1B2F45B3CE00D8338A /* ExportDocumentPopupVC.swift */,
+				04A9AA122F4443D3005CDB50 /* HomeVC.swift */,
+				0404B98E2F48617A00312E6E /* SelectedDocViewerVC.swift */,
+				047BB9002F480E5000731570 /* MergeVC.swift */,
+				04A12CDD2F47051F000BAAE4 /* MyWorksVC.swift */,
+				04A12CD92F470263000BAAE4 /* PDFViewVC.swift */,
+				040B748A2F45E5AC00C3EBF1 /* SignatureManageVC.swift */,
+				041043A32F4C07950092B577 /* WebViewVC.swift */,
+				04A12CDB2F470448000BAAE4 /* TabVC.swift */,
+				0450990B2F4FF9A800F17F5F /* MarkTagVC.swift */,
+				0450990F2F50087900F17F5F /* DocReaderVC.swift */,
+				045099112F5018DD00F17F5F /* FileInfoVC.swift */,
+			);
+			path = Controllers;
+			sourceTree = "<group>";
+		};
+		04A9AA082F444330005CDB50 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				049038612F444CF300BB207E /* Xibs */,
+				04A9AA052F444330005CDB50 /* LaunchScreen.storyboard */,
+				04A9AA072F444330005CDB50 /* Main.storyboard */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		04A9AA0A2F444330005CDB50 /* PDF Tools */ = {
+			isa = PBXGroup;
+			children = (
+				0457B1BA2F46C2A600D5F835 /* Resorces */,
+				04A9A9FF2F444330005CDB50 /* AppConfig */,
+				0490385C2F444B3E00BB207E /* Components */,
+				04A9AA012F444330005CDB50 /* Controllers */,
+				049038502F44458A00BB207E /* Helper */,
+				04A9AA092F444330005CDB50 /* Info.plist */,
+				049038672F444D8700BB207E /* Model */,
+				04A9AA082F444330005CDB50 /* View */,
+			);
+			path = "PDF Tools";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		04A9A9E02F4442F2005CDB50 /* PDF Tools */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 04A9A9F42F4442F4005CDB50 /* Build configuration list for PBXNativeTarget "PDF Tools" */;
+			buildPhases = (
+				04A9A9DD2F4442F2005CDB50 /* Sources */,
+				04A9A9DE2F4442F2005CDB50 /* Frameworks */,
+				04A9A9DF2F4442F2005CDB50 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "PDF Tools";
+			packageProductDependencies = (
+				04B23FA02F4583090023F8E3 /* CropViewController */,
+				04B23FA22F4583090023F8E3 /* TOCropViewController */,
+				0404B9912F4883BF00312E6E /* CoreXLSX */,
+				04AF75822F4C5E3A001801D6 /* PDFCompressorKit */,
+			);
+			productName = "PDF Tools";
+			productReference = 04A9A9E12F4442F2005CDB50 /* PDF Tools.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		04A9A9D92F4442F2005CDB50 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2620;
+				LastUpgradeCheck = 2620;
+				TargetAttributes = {
+					04A9A9E02F4442F2005CDB50 = {
+						CreatedOnToolsVersion = 26.2;
+					};
+				};
+			};
+			buildConfigurationList = 04A9A9DC2F4442F2005CDB50 /* Build configuration list for PBXProject "PDF Tools" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 04A9A9D82F4442F2005CDB50;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				04B23F9F2F4583090023F8E3 /* XCRemoteSwiftPackageReference "TOCropViewController" */,
+				0404B9902F4883BF00312E6E /* XCRemoteSwiftPackageReference "CoreXLSX" */,
+				04AF75812F4C5E3A001801D6 /* XCRemoteSwiftPackageReference "PDFCompressorKit" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 04A9A9E22F4442F2005CDB50 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				04A9A9E02F4442F2005CDB50 /* PDF Tools */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		04A9A9DF2F4442F2005CDB50 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				04A9AA0C2F444330005CDB50 /* LaunchScreen.storyboard in Resources */,
+				047BB9032F481DF800731570 /* cellAllFilesPDFs.xib in Resources */,
+				04A9AA0D2F444330005CDB50 /* Main.storyboard in Resources */,
+				040B74862F45DA4600C3EBF1 /* cellEffectsFeatures.xib in Resources */,
+				04A12CE52F471648000BAAE4 /* cellAllFiles.xib in Resources */,
+				04B23FAF2F45A41C0023F8E3 /* cellEditDoc.xib in Resources */,
+				0457B1B92F46C2A000D5F835 /* Assets.xcassets in Resources */,
+				049038652F444D1D00BB207E /* cellCameraFeatures.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		04A9A9DD2F4442F2005CDB50 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0490384E2F44456800BB207E /* CameraHandlerVC.swift in Sources */,
+				044F63362F45767F00F4B9AF /* CommonBoolean.swift in Sources */,
+				0457B1C42F46DA7200D5F835 /* DOCHelper.swift in Sources */,
+				047BB9012F480E5000731570 /* MergeVC.swift in Sources */,
+				04A9AA132F4443D3005CDB50 /* HomeVC.swift in Sources */,
+				0457B1BE2F46D52100D5F835 /* EditableImageView.swift in Sources */,
+				0490385E2F444B5300BB207E /* GridView.swift in Sources */,
+				04F00F1C2F45B3CE00D8338A /* ExportDocumentPopupVC.swift in Sources */,
+				0457B1C22F46D96400D5F835 /* DocumentGenSuccessVC.swift in Sources */,
+				04A12CD82F46F54C000BAAE4 /* NotificationNames.swift in Sources */,
+				049038592F44492900BB207E /* PermissionManager.swift in Sources */,
+				049038602F444C2100BB207E /* ThreadManager.swift in Sources */,
+				041043A42F4C07950092B577 /* WebViewVC.swift in Sources */,
+				04A9AA0F2F444330005CDB50 /* AppDelegate.swift in Sources */,
+				045099122F5018DD00F17F5F /* FileInfoVC.swift in Sources */,
+				040B74872F45DA4600C3EBF1 /* cellEffectsFeatures.swift in Sources */,
+				047BB9072F48423100731570 /* Enum.swift in Sources */,
+				04A12CE62F471648000BAAE4 /* cellAllFiles.swift in Sources */,
+				04AF75762F4C15DF001801D6 /* PreviewManager.swift in Sources */,
+				04251FD32F4EEC9A000B6317 /* CommonImageViewerVC.swift in Sources */,
+				04F00F1A2F45ADD900D8338A /* UIImage.swift in Sources */,
+				04A9AA102F444330005CDB50 /* SceneDelegate.swift in Sources */,
+				0490385B2F444A3400BB207E /* LogsManager.swift in Sources */,
+				040B74892F45E2D000C3EBF1 /* AlertHelper.swift in Sources */,
+				04AF757A2F4C1A65001801D6 /* WebViewPDFDelegate.swift in Sources */,
+				041F33FA2F4487DF00A7F1DB /* CropDocumentVC.swift in Sources */,
+				0457B1BC2F46C73A00D5F835 /* UIViewController.swift in Sources */,
+				049038692F444D9000BB207E /* Model.swift in Sources */,
+				047BB9092F48581800731570 /* MailHelper.swift in Sources */,
+				04A12CDA2F470263000BAAE4 /* PDFViewVC.swift in Sources */,
+				04A12CD62F46EB19000BAAE4 /* FileStorageManager.swift in Sources */,
+				0450990C2F4FF9A800F17F5F /* MarkTagVC.swift in Sources */,
+				047BB90B2F485DEB00731570 /* DocumentPickerHelper.swift in Sources */,
+				04B23FA92F459D710023F8E3 /* UITextField.swift in Sources */,
+				04B23FAE2F45A41C0023F8E3 /* cellEditDoc.swift in Sources */,
+				045099102F50087900F17F5F /* DocReaderVC.swift in Sources */,
+				04251FD12F4EA8E3000B6317 /* PDFProtectionManager.swift in Sources */,
+				04A12CDC2F470448000BAAE4 /* TabVC.swift in Sources */,
+				040B748B2F45E5AC00C3EBF1 /* SignatureManageVC.swift in Sources */,
+				044F63342F45707D00F4B9AF /* UIView.swift in Sources */,
+				049038572F4445D100BB207E /* NavigationManager.swift in Sources */,
+				047BB9052F481E0800731570 /* cellAllFilesPDFs.swift in Sources */,
+				0404B98F2F48617A00312E6E /* SelectedDocViewerVC.swift in Sources */,
+				04B23FA52F4596CD0023F8E3 /* EditDocumentVC.swift in Sources */,
+				0490386E2F445C9F00BB207E /* UILabel.swift in Sources */,
+				049038662F444D1D00BB207E /* cellCameraFeatures.swift in Sources */,
+				04A12CDE2F47051F000BAAE4 /* MyWorksVC.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		04A9AA052F444330005CDB50 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				04A9AA042F444330005CDB50 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		04A9AA072F444330005CDB50 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				04A9AA062F444330005CDB50 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		04A9A9F52F4442F4005CDB50 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = VVFQBADHUJ;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "PDF Tools/Info.plist";
+				INFOPLIST_KEY_NSCameraUsageDescription = "We need camera access to let you take photos within the app.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This app requires access to the photo library to set a profile picture.";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pdfscannerpro.pdftoolsappssmart;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		04A9A9F62F4442F4005CDB50 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = VVFQBADHUJ;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "PDF Tools/Info.plist";
+				INFOPLIST_KEY_NSCameraUsageDescription = "We need camera access to let you take photos within the app.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This app requires access to the photo library to set a profile picture.";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pdfscannerpro.pdftoolsappssmart;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		04A9A9F72F4442F4005CDB50 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		04A9A9F82F4442F4005CDB50 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		04A9A9DC2F4442F2005CDB50 /* Build configuration list for PBXProject "PDF Tools" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				04A9A9F72F4442F4005CDB50 /* Debug */,
+				04A9A9F82F4442F4005CDB50 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		04A9A9F42F4442F4005CDB50 /* Build configuration list for PBXNativeTarget "PDF Tools" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				04A9A9F52F4442F4005CDB50 /* Debug */,
+				04A9A9F62F4442F4005CDB50 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		0404B9902F4883BF00312E6E /* XCRemoteSwiftPackageReference "CoreXLSX" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/CoreOffice/CoreXLSX";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.14.2;
+			};
+		};
+		04AF75812F4C5E3A001801D6 /* XCRemoteSwiftPackageReference "PDFCompressorKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/GhuffraanAsghar/PDFCompressorKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.0;
+			};
+		};
+		04B23F9F2F4583090023F8E3 /* XCRemoteSwiftPackageReference "TOCropViewController" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/TimOliver/TOCropViewController.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.1.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		0404B9912F4883BF00312E6E /* CoreXLSX */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0404B9902F4883BF00312E6E /* XCRemoteSwiftPackageReference "CoreXLSX" */;
+			productName = CoreXLSX;
+		};
+		04AF75822F4C5E3A001801D6 /* PDFCompressorKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 04AF75812F4C5E3A001801D6 /* XCRemoteSwiftPackageReference "PDFCompressorKit" */;
+			productName = PDFCompressorKit;
+		};
+		04B23FA02F4583090023F8E3 /* CropViewController */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 04B23F9F2F4583090023F8E3 /* XCRemoteSwiftPackageReference "TOCropViewController" */;
+			productName = CropViewController;
+		};
+		04B23FA22F4583090023F8E3 /* TOCropViewController */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 04B23F9F2F4583090023F8E3 /* XCRemoteSwiftPackageReference "TOCropViewController" */;
+			productName = TOCropViewController;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 04A9A9D92F4442F2005CDB50 /* Project object */;
+}
