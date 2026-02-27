@@ -330,7 +330,7 @@ extension MyWorksVC {
             }
             
         case .duplicate:
-            try? FileStorageManager.duplicate(at: file.url); loadFiles()
+            _ = try? FileStorageManager.duplicate(at: file.url); loadFiles()
             
         case .email:
             MailHelper.shared.shareFileViaMail(fileURL: file.url, from: self, subject: "PDF File", body: "Requested file.")

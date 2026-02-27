@@ -114,7 +114,7 @@ extension CameraHandlerVC {
     func setupUI() {
         collectionViewFeatures.register(UINib(nibName: "cellCameraFeatures", bundle: .main), forCellWithReuseIdentifier: "cellCameraFeatures")
         collectionViewFeatures.delegate = self; collectionViewFeatures.dataSource = self
-        [view_dot, view_bgSelectedimageCount, lbl_selectedImageCount].forEach { $0?.layer.cornerRadius = $0!.frame.height / 2 }
+        [view_dot, view_bgSelectedimageCount, lbl_selectedImageCount].forEach { $0?.layer.cornerRadius = ($0?.frame.height ?? 0) / 2 }
         [view_qr, view_passport, view_idCard].forEach { 
             $0.layer.borderWidth = 2; $0.layer.borderColor = UIColor.white.cgColor
             $0.backgroundColor = UIColor.lightGray.withAlphaComponent(0.5); $0.isHidden = true 
@@ -124,7 +124,7 @@ extension CameraHandlerVC {
     
     func navigateToCropDocVC(img: UIImage?, imgs: [UIImage]?, from vc: UIViewController) {
         if let cropVC = storyboard?.instantiateViewController(withIdentifier: "CropDocumentVC") as? CropDocumentVC {
-            cropVC.capturedCameraImage = img; cropVC.selectedPassedImages = imgs!
+            cropVC.capturedCameraImage = img; cropVC.selectedPassedImages = imgs ?? []
             cropVC.onImagesUpdated = { [weak self] imgs in
                 self?.selectedImages = imgs; self?.imgCount = imgs.count; self?.updateSelectedImageCount()
             }
@@ -142,18 +142,17 @@ extension CameraHandlerVC {
         captureSession = AVCaptureSession(); captureSession?.sessionPreset = .photo
         guard let device = AVCaptureDevice.default(for: .video), let input = try? AVCaptureDeviceInput(device: device) else { return }
         stillImageOutput = AVCapturePhotoOutput()
-        if captureSession!.canAddInput(input) && captureSession!.canAddOutput(stillImageOutput!) {
-            captureSession!.addInput(input); captureSession!.addOutput(stillImageOutput!)
-            previewLayer = AVCaptureVideoPreviewLayer(session: captureSession!)
+        if let session = captureSession, let output = stillImageOutput, session.canAddInput(input) && session.canAddOutput(output) {
+            session.addInput(input); session.addOutput(output)
+            previewLayer = AVCaptureVideoPreviewLayer(session: session)
             previewLayer?.videoGravity = .resizeAspectFill; previewLayer?.connection?.videoRotationAngle = 90
-            view_camera.layer.addSublayer(previewLayer!); previewLayer?.frame = view_camera.bounds
+            if let preview = previewLayer { view_camera.layer.addSublayer(preview); preview.frame = view_camera.bounds }
         }
     }
     
     func setupGridView() {
         gridView = GridView(); gridView.translatesAutoresizingMaskIntoConstraints = false; view.addSubview(gridView)
-        NSLayoutConstraint.activate([gridView.topAnchor.constraint(equalTo: view.topAnchor), gridView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-                                   gridView.leadingAnchor.constraint(equalTo: view.leadingAnchor), gridView.trailingAnchor.constraint(equalTo: view.trailingAnchor)])
+        NSLayoutConstraint.activate([gridView.topAnchor.constraint(equalTo: view.topAnchor), gridView.bottomAnchor.constraint(equalTo: view.bottomAnchor), gridView.leadingAnchor.constraint(equalTo: view.leadingAnchor), gridView.trailingAnchor.constraint(equalTo: view.trailingAnchor)])
     }
     
     func configPhotosOpening() {

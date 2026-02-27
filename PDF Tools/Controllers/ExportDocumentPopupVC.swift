@@ -39,9 +39,6 @@ class ExportDocumentPopupVC: UIViewController {
     @IBAction func onTapped_save(_ sender: Any) {
         let selectedIndex = segmented_fileType.selectedSegmentIndex
         Logger.print("Selected Segment Index: \(selectedIndex)", level: .success)
-        
-        let sliderValue = Int(slider_qualityRatio.value)
-        Logger.print("Select Quality: \(sliderValue)", level: .success)
         savePDF()
     }
     
@@ -65,7 +62,6 @@ extension ExportDocumentPopupVC {
             txt_docName.text = fileName
             
             setupSegment()
-            setupSlider()
             hideKeyboardOnTap()
             Logger.print("Recived images array count to convert in PDF >>>>>> \(finalGenrableImages.count)", level: .success)
         }

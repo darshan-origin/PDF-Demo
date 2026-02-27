@@ -19,7 +19,6 @@ extension UIView {
         layer.rasterizationScale = UIScreen.main.scale
     }
     
-    
     func applyShadow(
         cornerRadius: CGFloat = 12,
         shadowColor: UIColor = .black,
@@ -39,5 +38,11 @@ extension UIView {
             cornerRadius: cornerRadius
         )
         self.layer.shadowPath = path.cgPath
+    }
+    
+    func roundCorners(corners: CACornerMask, radius: CGFloat) {
+        self.layer.cornerRadius = radius
+        self.layer.maskedCorners = corners
+        self.clipsToBounds = true
     }
 }
