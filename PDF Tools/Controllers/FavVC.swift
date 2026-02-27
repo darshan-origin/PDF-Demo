@@ -200,6 +200,24 @@ extension FavVC {
                 }
             }
             
+        case .compressSize:
+            guard file.url.pathExtension.lowercased() == "pdf" else { return }
+            LoaderView.shared.show(on: self.view)
+            ThreadManager.shared.background {
+                do {
+                    try DOCHelper.shared.compressPDF(at: file.url)
+                    ThreadManager.shared.main {
+                        self.loadFavorites()
+                        LoaderView.shared.hide()
+                    }
+                } catch {
+                    ThreadManager.shared.main {
+                        LoaderView.shared.hide()
+                    }
+                    Logger.print("Compression failed: \(error)", level: .error)
+                }
+            }
+            
         case .duplicate:
             do {
                 _ = try FileStorageManager.duplicate(at: file.url)

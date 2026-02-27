@@ -20,6 +20,7 @@ public enum FileAction: String, CaseIterable {
     case move = "Move"
     case info = "Info"
     case compress = "Compress"
+    case compressSize = "Compress size"
     case duplicate = "Duplicate"
     case email = "Email"
     case share = "Share"

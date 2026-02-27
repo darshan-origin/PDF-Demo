@@ -28,21 +28,20 @@ extension UIImage {
     }
     
     func withWatermark(image watermark: UIImage, opacity: CGFloat = 0.5) -> UIImage? {
-        let size = self.size
-        UIGraphicsBeginImageContextWithOptions(size, false, self.scale)
-        self.draw(in: CGRect(origin: .zero, size: size))
-        
-        let watermarkWidth = size.width * 0.15
-        let watermarkHeight = (watermark.size.height / watermark.size.width) * watermarkWidth
-        let padding: CGFloat = 20
-        let rect = CGRect( x: size.width - watermarkWidth - padding, y: size.height - watermarkHeight - padding, width: watermarkWidth, height: watermarkHeight )
-        
-        watermark.draw(in: rect, blendMode: .normal, alpha: opacity)
-        
-        let watermarkedImage = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        
-        return watermarkedImage
+        autoreleasepool {
+            let size = self.size
+            let renderer = UIGraphicsImageRenderer(size: size, format: UIGraphicsImageRendererFormat.default())
+            return renderer.image { context in
+                self.draw(in: CGRect(origin: .zero, size: size))
+                
+                let watermarkWidth = size.width * 0.15
+                let watermarkHeight = (watermark.size.height / watermark.size.width) * watermarkWidth
+                let padding: CGFloat = 20
+                let rect = CGRect(x: size.width - watermarkWidth - padding, y: size.height - watermarkHeight - padding, width: watermarkWidth, height: watermarkHeight)
+                
+                watermark.draw(in: rect, blendMode: .normal, alpha: opacity)
+            }
+        }
     }
     
 }

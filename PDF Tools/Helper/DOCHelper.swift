@@ -22,19 +22,44 @@ final class DOCHelper {
     private var activeDelegates = Set<WebViewPDFDelegate>()
     
     /// create a PDF using arrays of UIImage and return a generated PDF Data
-    func createPDF(from images: [UIImage]) -> Data? {
+    func createPDF(from images: [UIImage], watermark: UIImage? = nil, quality: CGFloat = 0.8, maxDimension: CGFloat = 2560) -> Data? {
         let pdfData = NSMutableData()
         let defaultPageBounds = CGRect(x: 0, y: 0, width: 595.2, height: 841.8)
         UIGraphicsBeginPDFContextToData(pdfData, defaultPageBounds, nil)
         
         for image in images {
-            let imageBounds = CGRect(origin: .zero, size: image.size)
-            UIGraphicsBeginPDFPageWithInfo(imageBounds, nil)
-            guard UIGraphicsGetCurrentContext() != nil else { continue }
-            image.draw(in: imageBounds)
+            autoreleasepool {
+                let imageSize = image.size
+                var finalRect = CGRect(origin: .zero, size: imageSize)
+                
+                if imageSize.width > maxDimension || imageSize.height > maxDimension {
+                    let ratio = imageSize.width / imageSize.height
+                    if ratio > 1 {
+                        finalRect.size = CGSize(width: maxDimension, height: maxDimension / ratio)
+                    } else {
+                        finalRect.size = CGSize(width: maxDimension * ratio, height: maxDimension)
+                    }
+                }
+                
+                UIGraphicsBeginPDFPageWithInfo(finalRect, nil)
+                
+                if let compressedData = image.jpegData(compressionQuality: quality),
+                   let compressedImage = UIImage(data: compressedData) {
+                    compressedImage.draw(in: finalRect)
+                } else {
+                    image.draw(in: finalRect)
+                }
+                
+                if let watermark = watermark {
+                    let watermarkWidth = finalRect.width * 0.15
+                    let watermarkHeight = (watermark.size.height / watermark.size.width) * watermarkWidth
+                    let padding: CGFloat = 20
+                    let rect = CGRect(x: finalRect.width - watermarkWidth - padding, y: finalRect.height - watermarkHeight - padding, width: watermarkWidth, height: watermarkHeight)
+                    watermark.draw(in: rect, blendMode: .normal, alpha: 0.5)
+                }
+            }
         }
         UIGraphicsEndPDFContext()
-        
         return pdfData as Data
     }
     
@@ -551,6 +576,22 @@ final class DOCHelper {
         
         return xipDATA
     }
+
+    /// compress pdf size and replace with original
+    func compressPDF(at url: URL) throws {
+        let compressor = PDFCompressor()
+        let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + ".pdf")
+        
+        try compressor.compress(
+            inputURL: url,
+            outputURL: tempURL,
+            level: .high
+        )
+        
+        try FileStorageManager.delete(at: url)
+        try FileStorageManager.move(from: tempURL, to: url)
+    }
+
     
     func unzipFile(fromWhich: URL, destinationURL: URL) {
         let fileManager = FileManager.default

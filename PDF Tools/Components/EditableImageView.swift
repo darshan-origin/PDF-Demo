@@ -9,365 +9,283 @@ class EditableImageView: UIView {
     
     weak var delegate: EditableImageViewDelegate?
     let imageView = UIImageView()
-    var editMode: EditableViewMode = .general
-    var onDateChangeTapped: (() -> Void)?
-    var isSelected: Bool = false {
-        didSet { animateSelectionState() }
+    
+    var editMode: EditableViewMode = .general {
+        didSet { updateControlVisibility(animated: false) }
     }
     
+    var onDateChangeTapped: (() -> Void)?
+    
+    var isSelected: Bool = false {
+        didSet {
+            updateControlVisibility(animated: true)
+            if isSelected {
+                superview?.bringSubviewToFront(self)
+            }
+        }
+    }
+    
+    // UI Elements
     private let deleteButton = UIButton(type: .custom)
     private let resizeButton = UIButton(type: .custom)
-    private let rotateButton = UIButton(type: .custom)
-    private let flipButton   = UIButton(type: .custom)
-    private let changeDateButton = UIButton(type: .custom)
-    private let controlSize: CGFloat  = 22
-    private let touchTarget: CGFloat  = 22        // generous tap area
-    private let borderInset: CGFloat  = 11        // half of controlSize
-    private var lastRotationAngle: CGFloat = 0
+    private let dashedBorder = CAShapeLayer()
+    
+    // Constants
+    private let controlSize: CGFloat = 30
+    private let touchArea: CGFloat = 44
+    private let borderPadding: CGFloat = 15
+    
+    // State for gestures
     private var initialBounds: CGRect = .zero
     private var initialDistance: CGFloat = 0
-    private let dashedBorder = CAShapeLayer()
-    private var dragPanGesture: UIPanGestureRecognizer!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        commonInit()
+        setupView()
     }
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-        commonInit()
+        setupView()
     }
     
-    private func commonInit() {
+    private func setupView() {
         backgroundColor = .clear
         clipsToBounds = false
+        isUserInteractionEnabled = true
         
-        setupImageView()
-        setupDashedBorder()
-        setupControlButtons()
-        setupGestures()
-        setControlsVisible(false, animated: false)
-    }
-    
-    private func setupImageView() {
+        // Image View
         imageView.contentMode = .scaleAspectFit
         imageView.isUserInteractionEnabled = false
-        imageView.clipsToBounds = true
         addSubview(imageView)
-    }
-    
-    private func setupDashedBorder() {
-        dashedBorder.fillColor = UIColor.clear.cgColor
-        dashedBorder.strokeColor = UIColor.systemBlue.cgColor
-        dashedBorder.lineWidth = 1.5
-        dashedBorder.lineDashPattern = [6, 4]
+        
+        // Dashed Border
+        dashedBorder.strokeColor = UIColor.lightGray.withAlphaComponent(0.6).cgColor
+        dashedBorder.fillColor = nil
+        dashedBorder.lineWidth = 1.0
+        dashedBorder.lineDashPattern = [4, 3]
         dashedBorder.opacity = 0
         layer.addSublayer(dashedBorder)
-    }
-    
-    private func setupControlButtons() {
-        configureControl(flipButton, systemName: "arrow.left.and.right.righttriangle.left.righttriangle.right.fill",color: .systemYellow)
-        flipButton.addTarget(self, action: #selector(onFlipTapped), for: .touchUpInside)
         
-        configureControl(deleteButton, systemName: "xmark.circle.fill", color: .systemRed)
-        deleteButton.addTarget(self, action: #selector(onDeleteTapped), for: .touchUpInside)
+        // Controls
+        // Trash icon at top-left
+        setupControl(deleteButton, icon: "trash.fill", color: .systemRed, action: #selector(handleDelete))
         
-        configureControl(rotateButton, systemName: "rotate.right.fill", color: .systemGreen)
-        let rotatePan = UIPanGestureRecognizer(target: self, action: #selector(handleRotateCornerPan(_:)))
-        rotateButton.addGestureRecognizer(rotatePan)
-        
-        configureControl(resizeButton, systemName: "arrow.up.left.and.arrow.down.right.circle.fill", color: .systemBlue)
-        let resizePan = UIPanGestureRecognizer(target: self, action: #selector(handleResizeCornerPan(_:)))
+        // Resize icon at bottom-right
+        setupControl(resizeButton, icon: "arrow.down.left.and.arrow.up.right", color: .white, iconColor: .systemRed, action: nil)
+        let resizePan = UIPanGestureRecognizer(target: self, action: #selector(handleResizePan(_:)))
         resizeButton.addGestureRecognizer(resizePan)
         
-        configureControl(changeDateButton, systemName: "calendar.badge.plus", color: .systemIndigo)
-        changeDateButton.addTarget(self, action: #selector(onDateChangeInternalTapped), for: .touchUpInside)
+        // Main Gestures
+        let dragGesture = UIPanGestureRecognizer(target: self, action: #selector(handleDrag(_:)))
+        dragGesture.delegate = self
+        addGestureRecognizer(dragGesture)
         
-        [flipButton, deleteButton, rotateButton, resizeButton, changeDateButton].forEach { addSubview($0) }
-    }
-    
-    private func configureControl(_ button: UIButton, systemName: String, color: UIColor) {
-        let symbolConfig = UIImage.SymbolConfiguration(pointSize: controlSize * 0.5, weight: .bold)
-        button.setImage(UIImage(systemName: systemName, withConfiguration: symbolConfig), for: .normal)
-        button.tintColor = .white
-        button.backgroundColor = color
-        button.layer.cornerRadius = controlSize / 2
-        button.clipsToBounds = false
-        button.layer.shadowColor = UIColor.black.cgColor
-        button.layer.shadowOffset = CGSize(width: 0, height: 1.5)
-        button.layer.shadowOpacity = 0.35
-        button.layer.shadowRadius = 3
-        button.frame = CGRect(x: 0, y: 0, width: touchTarget, height: touchTarget)
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
+        tapGesture.delegate = self
+        addGestureRecognizer(tapGesture)
         
-        var config = UIButton.Configuration.plain()
-        let pad = (touchTarget - controlSize) / 2
-        config.contentInsets = NSDirectionalEdgeInsets(top: pad, leading: pad, bottom: pad, trailing: pad)
-        button.configuration = config
-        button.backgroundColor = color
-    }
-    
-    private func setupGestures() {
-        dragPanGesture = UIPanGestureRecognizer(target: self, action: #selector(handleDragPan(_:)))
-        dragPanGesture.maximumNumberOfTouches = 1
-        dragPanGesture.delegate = self
-        addGestureRecognizer(dragPanGesture)
+        let doubleTap = UITapGestureRecognizer(target: self, action: #selector(handleDoubleTap(_:)))
+        doubleTap.numberOfTapsRequired = 2
+        addGestureRecognizer(doubleTap)
+        tapGesture.require(toFail: doubleTap)
         
-        let tap = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
-        addGestureRecognizer(tap)
-        
+        // Support standard pinch for extra smoothness
         let pinch = UIPinchGestureRecognizer(target: self, action: #selector(handlePinch(_:)))
         pinch.delegate = self
         addGestureRecognizer(pinch)
         
-        let rotation = UIRotationGestureRecognizer(target: self, action: #selector(handleTwoFingerRotation(_:)))
-        rotation.delegate = self
-        addGestureRecognizer(rotation)
+        updateControlVisibility(animated: false)
     }
     
+    private func setupControl(_ button: UIButton, icon: String, color: UIColor, iconColor: UIColor = .white, action: Selector?) {
+        let config = UIImage.SymbolConfiguration(pointSize: 12, weight: .bold)
+        button.setImage(UIImage(systemName: icon, withConfiguration: config), for: .normal)
+        button.tintColor = iconColor
+        button.backgroundColor = color
+        button.layer.cornerRadius = controlSize / 2
+        button.isExclusiveTouch = true
+        
+        // Shadow for premium look
+        button.layer.shadowColor = UIColor.black.cgColor
+        button.layer.shadowOffset = CGSize(width: 0, height: 2)
+        button.layer.shadowOpacity = 0.3
+        button.layer.shadowRadius = 4
+        
+        if let action = action {
+            button.addTarget(self, action: action, for: .touchUpInside)
+        }
+        
+        addSubview(button)
+    }
     
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        imageView.frame = bounds.insetBy(dx: borderInset, dy: borderInset)
+        let contentRect = bounds.insetBy(dx: borderPadding, dy: borderPadding)
+        imageView.frame = contentRect
         
-        let borderRect = bounds.insetBy(dx: borderInset, dy: borderInset)
-        dashedBorder.path = UIBezierPath(rect: borderRect).cgPath
         dashedBorder.frame = bounds
-        flipButton.center   = CGPoint(x: 0, y: 0)                       // Top-Left
-        deleteButton.center  = CGPoint(x: bounds.width, y: 0)           // Top-Right
-        rotateButton.center  = CGPoint(x: 0, y: bounds.height)          // Bottom-Left
-        resizeButton.center  = CGPoint(x: bounds.width, y: bounds.height) // Bottom-Right
-        changeDateButton.center = CGPoint(x: bounds.width, y: bounds.height) // Bottom-Right (Date Mode)
-    }
-    
-    private func animateSelectionState() {
-        setControlsVisible(isSelected, animated: true)
-    }
-    
-    private func setControlsVisible(_ visible: Bool, animated: Bool) {
-        let targetAlpha: CGFloat = visible ? 1.0 : 0.0
-        let borderOpacity: Float = visible ? 1.0 : 0.0
+        dashedBorder.path = UIBezierPath(rect: contentRect).cgPath
         
-        let work = { [self] in
-            if editMode == .general {
-                flipButton.alpha = targetAlpha
-                rotateButton.alpha = targetAlpha
-                resizeButton.alpha = targetAlpha
-                changeDateButton.alpha = 0
-            } else {
-                flipButton.alpha = 0
-                rotateButton.alpha = 0
-                resizeButton.alpha = 0
-                changeDateButton.alpha = targetAlpha
+        // Positions based on the mockup image
+        let halfTouch = touchArea / 2
+        
+        // Top-Left: Delete
+        deleteButton.frame = CGRect(x: borderPadding - halfTouch, y: borderPadding - halfTouch, width: touchArea, height: touchArea)
+        
+        // Bottom-Right: Resize
+        resizeButton.frame = CGRect(x: bounds.width - borderPadding - halfTouch, y: bounds.height - borderPadding - halfTouch, width: touchArea, height: touchArea)
+        
+        [deleteButton, resizeButton].forEach { btn in
+            let pad = (touchArea - controlSize) / 2
+            btn.contentEdgeInsets = UIEdgeInsets(top: pad, left: pad, bottom: pad, right: pad)
+        }
+    }
+    
+    // MARK: - Interaction
+    
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        if isHidden || alpha < 0.01 || !isUserInteractionEnabled { return nil }
+        
+        if isSelected {
+            for btn in [deleteButton, resizeButton] {
+                let localPoint = convert(point, to: btn)
+                if btn.point(inside: localPoint, with: event) {
+                    return btn
+                }
             }
-            deleteButton.alpha = targetAlpha
-            dashedBorder.opacity = borderOpacity
+        }
+        
+        if self.point(inside: point, with: event) {
+            return super.hitTest(point, with: event) ?? self
+        }
+        
+        return nil
+    }
+    
+    override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
+        let expanded = bounds.insetBy(dx: -borderPadding, dy: -borderPadding)
+        return expanded.contains(point)
+    }
+    
+    // MARK: - Visibility
+    
+    private func updateControlVisibility(animated: Bool) {
+        let targetAlpha: CGFloat = isSelected ? 1.0 : 0.0
+        
+        let actions = {
+            self.dashedBorder.opacity = Float(targetAlpha)
+            self.deleteButton.alpha = targetAlpha
+            self.resizeButton.alpha = targetAlpha
+            
+            self.deleteButton.isUserInteractionEnabled = self.isSelected
+            self.resizeButton.isUserInteractionEnabled = self.isSelected
         }
         
         if animated {
-            UIView.animate(withDuration: 0.22, delay: 0, usingSpringWithDamping: 0.85, initialSpringVelocity: 0.5, options: .curveEaseInOut) {
-                work()
-            }
+            UIView.animate(withDuration: 0.25, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.5, options: .allowUserInteraction, animations: actions)
             
-            if visible {
-                [flipButton, deleteButton, rotateButton, resizeButton].forEach { btn in
-                    btn.transform = CGAffineTransform(scaleX: 0.01, y: 0.01)
-                    UIView.animate(withDuration: 0.35, delay: 0.05, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.8) {
-                        btn.transform = .identity
+            if isSelected {
+                [deleteButton, resizeButton].forEach { button in
+                    button.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+                    UIView.animate(withDuration: 0.4, delay: 0, usingSpringWithDamping: 0.6, initialSpringVelocity: 1.0) {
+                        button.transform = .identity
                     }
                 }
             }
         } else {
-            work()
-        }
-        
-        [flipButton, deleteButton, rotateButton, resizeButton, changeDateButton].forEach {
-            $0.isUserInteractionEnabled = visible
+            actions()
         }
     }
     
-    private func lightHaptic() {
+    func hideControls() {
+        isSelected = false
+    }
+    
+    // MARK: - Gesture Handlers
+    
+    @objc private func handleTap(_ gesture: UITapGestureRecognizer) {
+        delegate?.didSelectView(self)
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
     }
     
-    private func mediumHaptic() {
-        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-    }
-    
-    
-    @objc private func handleTap(_ gesture: UITapGestureRecognizer) {
-        let loc = gesture.location(in: self)
-        for btn in [flipButton, deleteButton, rotateButton, resizeButton] where btn.frame.contains(loc) {
-            return
+    @objc private func handleDoubleTap(_ gesture: UITapGestureRecognizer) {
+        if let onDateChange = onDateChangeTapped {
+            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+            onDateChange()
         }
-        delegate?.didSelectView(self)
-        lightHaptic()
     }
     
-    @objc private func handleDragPan(_ gesture: UIPanGestureRecognizer) {
+    @objc private func handleDrag(_ gesture: UIPanGestureRecognizer) {
         guard let parent = superview else { return }
+        
+        if gesture.state == .began {
+            delegate?.didSelectView(self)
+        }
+        
+        let translation = gesture.translation(in: parent)
+        center = CGPoint(x: center.x + translation.x, y: center.y + translation.y)
+        gesture.setTranslation(.zero, in: parent)
+    }
+    
+    @objc private func handleResizePan(_ gesture: UIPanGestureRecognizer) {
+        guard let parent = superview else { return }
+        let point = gesture.location(in: parent)
         
         switch gesture.state {
         case .began:
-            delegate?.didSelectView(self)
-            lightHaptic()
-            
+            initialBounds = bounds
+            initialDistance = hypot(point.x - center.x, point.y - center.y)
+            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         case .changed:
-            let translation = gesture.translation(in: parent)
-            center = CGPoint(x: center.x + translation.x,
-                             y: center.y + translation.y)
-            gesture.setTranslation(.zero, in: parent)
+            let currentDist = hypot(point.x - center.x, point.y - center.y)
+            let scale = currentDist / initialDistance
             
-        default:
-            break
+            let newW = max(initialBounds.width * scale, 60)
+            let newH = max(initialBounds.height * scale, 60)
+            
+            bounds = CGRect(x: 0, y: 0, width: newW, height: newH)
+            setNeedsLayout()
+        default: break
         }
     }
     
     @objc private func handlePinch(_ gesture: UIPinchGestureRecognizer) {
-        switch gesture.state {
-        case .began:
-            delegate?.didSelectView(self)
-            
-        case .changed:
-            let currentScale = hypot(transform.a, transform.c)
-            let proposedScale = currentScale * gesture.scale
-            let clampedScale = min(max(proposedScale, 0.3), 5.0)
-            let delta = clampedScale / currentScale
-            
-            transform = transform.scaledBy(x: delta, y: delta)
-            gesture.scale = 1
-            
-        default:
-            break
+        if gesture.state == .changed {
+            let scale = gesture.scale
+            let newW = max(bounds.width * scale, 60)
+            let newH = max(bounds.height * scale, 60)
+            bounds = CGRect(x: 0, y: 0, width: newW, height: newH)
+            gesture.scale = 1.0
+            setNeedsLayout()
         }
     }
     
-    @objc private func handleTwoFingerRotation(_ gesture: UIRotationGestureRecognizer) {
-        switch gesture.state {
-        case .began:
-            delegate?.didSelectView(self)
-            
-        case .changed:
-            transform = transform.rotated(by: gesture.rotation)
-            gesture.rotation = 0
-            
-        default:
-            break
-        }
-    }
-    
-    
-    @objc private func onDeleteTapped() {
-        mediumHaptic()
-        
-        UIView.animate(withDuration: 0.25, animations: {
-            self.transform = self.transform.scaledBy(x: 0.01, y: 0.01)
+    @objc private func handleDelete() {
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
+        UIView.animate(withDuration: 0.2, animations: {
+            self.transform = self.transform.scaledBy(x: 0.1, y: 0.1)
             self.alpha = 0
         }) { _ in
             self.delegate?.didDeleteView(self)
             self.removeFromSuperview()
         }
     }
-    
-    @objc private func onFlipTapped() {
-        lightHaptic()
-        
-        UIView.animate(withDuration: 0.3, delay: 0,
-                       usingSpringWithDamping: 0.8,
-                       initialSpringVelocity: 0.5) {
-            self.imageView.transform = self.imageView.transform.scaledBy(x: -1, y: 1)
-        }
-    }
-    
-    @objc private func onDateChangeInternalTapped() {
-        lightHaptic()
-        onDateChangeTapped?()
-    }
-    
-    @objc private func handleResizeCornerPan(_ gesture: UIPanGestureRecognizer) {
-        switch gesture.state {
-        case .began:
-            initialBounds = bounds
-            delegate?.didSelectView(self)
-            lightHaptic()
-            
-        case .changed:
-            let translation = gesture.translation(in: superview)
-            let angle = atan2(transform.b, transform.a)
-            let dx = translation.x * cos(angle) + translation.y * sin(angle)
-            let dy = -translation.x * sin(angle) + translation.y * cos(angle)
-            let diag = (dx + dy) / 2.0
-            let minSize: CGFloat = 60
-            let newWidth  = max(initialBounds.width  + diag, minSize)
-            let newHeight = max(initialBounds.height + diag, minSize)
-            
-            let savedCenter = center
-            bounds = CGRect(x: 0, y: 0, width: newWidth, height: newHeight)
-            center = savedCenter
-            setNeedsLayout()
-            layoutIfNeeded()
-            
-        case .ended, .cancelled:
-            initialBounds = bounds
-            gesture.setTranslation(.zero, in: superview)
-            
-        default:
-            break
-        }
-    }
-    
-    @objc private func handleRotateCornerPan(_ gesture: UIPanGestureRecognizer) {
-        guard let parent = superview else { return }
-        let location = gesture.location(in: parent)
-        let viewCenter = center
-        
-        let currentAngle = atan2(location.y - viewCenter.y, location.x - viewCenter.x)
-        
-        switch gesture.state {
-        case .began:
-            lastRotationAngle = currentAngle
-            delegate?.didSelectView(self)
-            lightHaptic()
-            
-        case .changed:
-            let angleDelta = currentAngle - lastRotationAngle
-            transform = transform.rotated(by: angleDelta)
-            lastRotationAngle = currentAngle
-            
-        default:
-            break
-        }
-    }
-    
-    func hideControls() {
-        setControlsVisible(false, animated: false)
-    }
-    
-    func showControls() {
-        setControlsVisible(true, animated: false)
-    }
 }
 
 extension EditableImageView: UIGestureRecognizerDelegate {
-    
-    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith other: UIGestureRecognizer) -> Bool {
-        if (gestureRecognizer is UIPinchGestureRecognizer && other is UIRotationGestureRecognizer) ||
-            (gestureRecognizer is UIRotationGestureRecognizer && other is UIPinchGestureRecognizer) {
-            return true
-        }
-        return false
-    }
-    
-    override func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-        if gestureRecognizer === dragPanGesture {
-            let loc = gestureRecognizer.location(in: self)
-            for btn in [flipButton, deleteButton, rotateButton, resizeButton, changeDateButton] {
-                if btn.frame.contains(loc) {
-                    return false
-                }
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+        let loc = touch.location(in: self)
+        for btn in [deleteButton, resizeButton] {
+            if btn.isUserInteractionEnabled && btn.alpha > 0.1 && btn.frame.contains(loc) {
+                return false
             }
         }
+        return true
+    }
+    
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith other: UIGestureRecognizer) -> Bool {
         return true
     }
 }

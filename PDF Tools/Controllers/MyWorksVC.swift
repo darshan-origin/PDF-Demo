@@ -329,6 +329,12 @@ extension MyWorksVC {
                 try FileStorageManager.store(zipData, at: "\(DOCHelper.shared.fileName(from: file.url)).zip", in: .documents)
             }
             
+        case .compressSize:
+            guard file.url.pathExtension.lowercased() == "pdf" else { return }
+            performBackgroundAction {
+                try DOCHelper.shared.compressPDF(at: file.url)
+            }
+
         case .duplicate:
             _ = try? FileStorageManager.duplicate(at: file.url); loadFiles()
             

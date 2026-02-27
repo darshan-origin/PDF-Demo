@@ -99,39 +99,42 @@ extension ExportDocumentPopupVC {
 extension ExportDocumentPopupVC {
     
     func savePDF() {
-        var imagesToProcess = finalGenrableImages
-        if switch_watermark.isOn {
-            guard let watermarkImg = UIImage(named: "pdf_logo") else {
-                Logger.print("Watermark image not found", level: .error)
+        autoreleasepool {
+            var watermarkImg: UIImage? = nil
+            if let sw = switch_watermark, sw.isOn {
+                watermarkImg = UIImage(named: "pdf_logo")
+                if watermarkImg == nil {
+                    Logger.print("Watermark image not found", level: .error)
+                }
+            }
+            
+            // Map slider (1-4) to quality (0.2-0.8), default to 0.8 if slider is nil
+            let sliderVal = slider_qualityRatio?.value ?? 4.0
+            let mappedQuality: CGFloat = CGFloat(0.2 * sliderVal)
+            
+            guard let pdfData = DOCHelper.shared.createPDF(from: finalGenrableImages, watermark: watermarkImg, quality: mappedQuality) else {
+                Logger.print("Failed to generate PDF data", level: .error)
                 return
             }
-            imagesToProcess = finalGenrableImages.compactMap { image in
-                return image.withWatermark(image: watermarkImg)
+            do {
+                try FileStorageManager.store(pdfData, at: "\(fileName).pdf", in: .documents)
+                Logger.print("PDF saved successfully", level: .success)
+                let fileURL = FileStorageManager.url(for: "\(fileName).pdf", in: .documents)
+                
+                Logger.print("FINAL STORED PDF URL: >>>>>> \(fileURL)", level: .success)
+                let userInfo = ["pdfURL": fileURL]
+                
+                NotificationCenter.default.post(
+                    name: Notification.Name.PDF_URL_PASSING,
+                    object: nil,
+                    userInfo: userInfo
+                )
+                
+                self.dismiss(animated: true)
             }
-        }
-        
-        guard let pdfData = DOCHelper.shared.createPDF(from: imagesToProcess) else {
-            Logger.print("Failed to generate PDF data", level: .error)
-            return
-        }
-        do {
-            try FileStorageManager.store(pdfData, at: "\(fileName).pdf", in: .documents)
-            Logger.print("PDF saved successfully at >>>>>> \(pdfData)", level: .success)
-            let fileURL = FileStorageManager.url(for: "\(fileName).pdf", in: .documents)
-            
-            Logger.print("FINAL STORED PDF URL: >>>>>> \(fileURL)", level: .success)
-            let userInfo = ["pdfURL": fileURL]
-            
-            NotificationCenter.default.post(
-                name: Notification.Name.PDF_URL_PASSING,
-                object: nil,
-                userInfo: userInfo
-            )
-            
-            self.dismiss(animated: true)
-        }
-        catch {
-            Logger.print("Could not save PDF file >>>>>> \(error.localizedDescription)", level: .error)
+            catch {
+                Logger.print("Could not save PDF file >>>>>> \(error.localizedDescription)", level: .error)
+            }
         }
     }
 }

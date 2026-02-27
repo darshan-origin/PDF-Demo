@@ -38,8 +38,8 @@ class MergeVC: UIViewController {
             guard let url = fileURL else { return }
             let pages = isOrganize ? pageOrder.map { $0 + 1 } : selectedIndexes.sorted().map { $0 + 1 }
             performPDFAction(title: isOrganize ? "organized" : "splitted") {
-                self.isOrganize ? DOCHelper.shared.reorderPDF(sourceURL: url, pageNumbers: pages) : 
-                           DOCHelper.shared.splitPdfByPageNumbers(sourceURL: url, pageNumbers: pages)
+                self.isOrganize ? DOCHelper.shared.reorderPDF(sourceURL: url, pageNumbers: pages) :
+                DOCHelper.shared.splitPdfByPageNumbers(sourceURL: url, pageNumbers: pages)
             }
         } else {
             let selectedURLs = selectedIndexes.sorted().compactMap { $0 < filesArray.count ? filesArray[$0].url : nil }
@@ -57,8 +57,8 @@ class MergeVC: UIViewController {
                 let storedURL = FileStorageManager.url(for: "\(name).pdf", in: .documents)
                 ThreadManager.shared.main {
                     LoaderView.shared.hide()
-                    isMerge ? NavigationManager.shared.popROOTViewController(from: self) : 
-                             NavigationManager.shared.navigateToPDFViewVC(from: self, url: "\(storedURL)")
+                    isMerge ? NavigationManager.shared.popROOTViewController(from: self) :
+                    NavigationManager.shared.navigateToPDFViewVC(from: self, url: "\(storedURL)")
                 }
             } catch {
                 ThreadManager.shared.main { LoaderView.shared.hide() }

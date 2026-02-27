@@ -42,14 +42,16 @@ class EditDocumentVC: UIViewController, UITextFieldDelegate, UIGestureRecognizer
         EffectFeatures (title: "Effect", icon: UIImage(systemName: "wand.and.sparkles.inverse")!),
         EffectFeatures (title: "Date", icon: UIImage(systemName: "calendar")!),
         EffectFeatures (title: "Watermark", icon: UIImage(systemName: "wonsign")!),
-        EffectFeatures (title: "Stricker", icon: UIImage(systemName: "face.smiling")!),
+        EffectFeatures (title: "Sticker", icon: UIImage(systemName: "face.smiling")!),
         EffectFeatures (title: "Filter", icon: UIImage(systemName: "drop.halffull")!),
     ]
     
     var capturedCameraImage: UIImage?
     private var bottomBaseOriginalConstant: CGFloat = 0
     private var editBaseOriginalConstant: CGFloat = 0
+    
     private var pendingFilterName: String?
+    private let ciContext = CIContext(options: [.useSoftwareRenderer: false])
     private let availableFilters: [(name: String, filterName: String)] = [
         ("None",               ""),
         ("Chrome",             "CIPhotoEffectChrome"),
@@ -156,6 +158,7 @@ extension EditDocumentVC {
         
         collectionview_passedImages.isPagingEnabled = true
         collectionview_passedImages.showsHorizontalScrollIndicator = false
+        collectionview_passedImages.delaysContentTouches = false
         
         if let layout = collectionview_passedImages.collectionViewLayout as? UICollectionViewFlowLayout {
             layout.scrollDirection = .horizontal
@@ -455,7 +458,6 @@ extension EditDocumentVC {
     private func applyFilter(named filterName: String, to image: UIImage) -> UIImage? {
         guard let cgImage = image.cgImage else { return nil }
         let ciImage = CIImage(cgImage: cgImage)
-        let context = CIContext(options: [.useSoftwareRenderer: false])
         
         guard let filter = CIFilter(name: filterName) else { return nil }
         filter.setValue(ciImage, forKey: kCIInputImageKey)
@@ -496,9 +498,15 @@ extension EditDocumentVC {
         params[filterName]?.forEach { filter.setValue($0.value, forKey: $0.key) }
         
         guard let output = filter.outputImage,
-              let cgOut = context.createCGImage(output, from: ciImage.extent) else { return nil }
+              let cgOut = ciContext.createCGImage(output, from: ciImage.extent) else { return nil }
         
-        return UIImage(cgImage: cgOut, scale: image.scale, orientation: image.imageOrientation)
+        let unfilteredResult = UIImage(cgImage: cgOut, scale: image.scale, orientation: image.imageOrientation)
+        
+        // Memory optimization: Archiving the filtered image to JPEG forces it to release its raw bitmap buffer
+        if let compressedData = unfilteredResult.jpegData(compressionQuality: 0.8) {
+            return UIImage(data: compressedData)
+        }
+        return unfilteredResult
     }
 }
 
@@ -518,15 +526,21 @@ extension EditDocumentVC: SecondaryViewControllerDelegate {
         guard let cell = collectionview_passedImages.cellForItem(at: IndexPath(item: currentCount, section: 0)) as? cellEditDoc,
               let baseView = cell.img_editableFullImage else { return }
         
+        cell.isUserInteractionEnabled = true
+        cell.contentView.isUserInteractionEnabled = true
+        baseView.isUserInteractionEnabled = true
+        
+        let borderPadding: CGFloat = 15 // Matches EditableImageView
         let baseFrame = baseView.bounds
-        let width = mode == .date ? max(baseFrame.width * 0.4, 150) : max(baseFrame.width * 0.15, 40)
+        let width = mode == .date ? max(baseFrame.width * 0.4, 150) : max(baseFrame.width * 0.25, 60)
         let height = width * (image.size.height / max(image.size.width, 1))
         
+        // Add padding to frame so the content image matches the desired width/height
         let container = EditableImageView(frame: CGRect(
-            x: baseFrame.midX - (width + 24) / 2,
-            y: baseFrame.midY - (height + 24) / 2,
-            width: width + 24,
-            height: height + 24
+            x: baseFrame.midX - (width + 2 * borderPadding) / 2,
+            y: baseFrame.midY - (height + 2 * borderPadding) / 2,
+            width: width + 2 * borderPadding,
+            height: height + 2 * borderPadding
         ))
         
         container.editMode = mode
@@ -541,7 +555,9 @@ extension EditDocumentVC: SecondaryViewControllerDelegate {
         }
         
         if (baseView.gestureRecognizers?.filter({ $0 is UITapGestureRecognizer }).isEmpty ?? true) {
-            baseView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(deselectAllOverlays)))
+            let tap = UITapGestureRecognizer(target: self, action: #selector(deselectAllOverlays))
+            tap.cancelsTouchesInView = false
+            baseView.addGestureRecognizer(tap)
         }
         
         baseView.addSubview(container)
@@ -598,12 +614,15 @@ extension EditDocumentVC: SecondaryViewControllerDelegate {
     @objc private func deselectAllOverlays() {
         selectedOverlay?.isSelected = false
         selectedOverlay = nil
+        overlayImageViews.forEach { $0.isSelected = false }
+        collectionview_passedImages.isScrollEnabled = true
     }
     
     private func selectOverlay(_ overlay: EditableImageView) {
         selectedOverlay?.isSelected = false
         selectedOverlay = overlay
         selectedOverlay?.isSelected = true
+        collectionview_passedImages.isScrollEnabled = false
     }
     
     // MARK: - EditableImageViewDelegate
@@ -618,6 +637,7 @@ extension EditDocumentVC: SecondaryViewControllerDelegate {
         }
         if selectedOverlay == view {
             selectedOverlay = nil
+            collectionview_passedImages.isScrollEnabled = true
         }
     }
     
@@ -626,26 +646,105 @@ extension EditDocumentVC: SecondaryViewControllerDelegate {
     private func mergeOverlaysForCurrentImage() {
         guard !arrFinalEditableImages.isEmpty else { return }
         let currentIndex = currentCount
-        guard let cell = collectionview_passedImages.cellForItem(
-            at: IndexPath(item: currentIndex, section: 0)
-        ) as? cellEditDoc else { return }
+        guard let cell = collectionview_passedImages.cellForItem(at: IndexPath(item: currentIndex, section: 0)) as? cellEditDoc,
+              let baseImageView = cell.img_editableFullImage else { return }
         
-        let imageView = cell.img_editableFullImage
+        let originalImage = arrFinalEditableImages[currentIndex]
         
-        deselectAllOverlays()
-        overlayImageViews.forEach { $0.hideControls() }
+        // Show loader to inform user of background processing
+        LoaderView.shared.show(on: self.view)
         
-        let renderer = UIGraphicsImageRenderer(size: (imageView?.bounds.size)!)
-        let mergedImage = renderer.image { ctx in
-            imageView?.layer.render(in: ctx.cgContext)
+        // 1. Collect all necessary UI-dependent data on Main Thread
+        let baseBounds = baseImageView.bounds
+        let rendererSize = originalImage.size
+        
+        // Captured data structures for background processing
+        struct OverlayData {
+            let image: UIImage
+            let rectInBase: CGRect
         }
         
-        arrFinalEditableImages[currentIndex] = mergedImage
-        imageView?.image = mergedImage
-        imageView?.transform = .identity
+        // Deselect and hide controls on main thread
+        deselectAllOverlays()
+        let capturedOverlays = overlayImageViews.map { overlay -> OverlayData? in
+            guard let img = overlay.imageView.image, overlay.superview == baseImageView else { return nil }
+            overlay.hideControls()
+            
+            let frame = overlay.frame
+            let contentFrame = overlay.imageView.frame
+            let rect = CGRect(
+                x: frame.origin.x + contentFrame.origin.x,
+                y: frame.origin.y + contentFrame.origin.y,
+                width: contentFrame.width,
+                height: contentFrame.height
+            )
+            return OverlayData(image: img, rectInBase: rect)
+        }.compactMap { $0 }
         
-        overlayImageViews.forEach { $0.removeFromSuperview() }
-        overlayImageViews.removeAll()
+        let overlaysToRemove = self.overlayImageViews
+        
+        // 2. Perform expensive rendering in Background
+        ThreadManager.shared.backgroundUserInitiated {
+            autoreleasepool {
+                // Lower cap to 2560 (A4 300dpi is ~2480px)
+                let maxDimension: CGFloat = 2560
+                var finalSize = rendererSize
+                if rendererSize.width > maxDimension || rendererSize.height > maxDimension {
+                    let ratio = rendererSize.width / rendererSize.height
+                    finalSize = ratio > 1 ? CGSize(width: maxDimension, height: maxDimension / ratio) : CGSize(width: maxDimension * ratio, height: maxDimension)
+                }
+                
+                // Use opaque format to save memory (no alpha channel for background)
+                let format = UIGraphicsImageRendererFormat.default()
+                format.opaque = true
+                format.preferredRange = .standard // Avoid 16-bit color deepness
+                
+                let renderer = UIGraphicsImageRenderer(size: finalSize, format: format)
+                var mergedResult: UIImage? = renderer.image { ctx in
+                    // Draw white background first since we are opaque
+                    UIColor.white.setFill()
+                    ctx.fill(CGRect(origin: .zero, size: finalSize))
+                    
+                    originalImage.draw(in: CGRect(origin: .zero, size: finalSize))
+                    
+                    let scaleX = finalSize.width / baseBounds.width
+                    let scaleY = finalSize.height / baseBounds.height
+                    
+                    for data in capturedOverlays {
+                        let renderRect = CGRect(
+                            x: data.rectInBase.origin.x * scaleX,
+                            y: data.rectInBase.origin.y * scaleY,
+                            width: data.rectInBase.width * scaleX,
+                            height: data.rectInBase.height * scaleY
+                        )
+                        data.image.draw(in: renderRect)
+                    }
+                }
+                
+                // CRITICAL: Archive the image by converting to JPEG and back. 
+                // This forces the UIImage to be backed by compressed data instead of a raw RGBA bitmap.
+                if let processed = mergedResult {
+                    if let compressedData = processed.jpegData(compressionQuality: 0.8) {
+                        mergedResult = UIImage(data: compressedData)
+                    }
+                }
+                
+                // 3. Update UI and Data back on Main Thread
+                ThreadManager.shared.main {
+                    // Help GC by removing old reference explicitly
+                    self.arrFinalEditableImages[currentIndex] = mergedResult ?? originalImage
+                    
+                    if self.currentCount == currentIndex {
+                        baseImageView.image = mergedResult
+                        overlaysToRemove.forEach { $0.removeFromSuperview() }
+                        self.overlayImageViews.removeAll()
+                    }
+                    
+                    LoaderView.shared.hide()
+                    baseImageView.isUserInteractionEnabled = true
+                }
+            }
+        }
     }
 }
 
