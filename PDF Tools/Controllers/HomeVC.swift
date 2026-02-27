@@ -1,18 +1,9 @@
-//
-//  HomeVC.swift
-//  PDF Tools
-//
-//  Created by mac on 17/02/26.
-//
-
 import UIKit
-import LocalAuthentication
 
 class HomeVC: UIViewController, UIDocumentPickerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        authenticateUser()
     }
     
     @IBAction func onTapped_scan(_ sender: Any) {
@@ -80,30 +71,6 @@ class HomeVC: UIViewController, UIDocumentPickerDelegate {
     @IBAction func onTapped_DOCviewer(_ sender: Any) {
         DocumentPickerHelper.openDoc(type: .all, from: self) { url in
             NavigationManager.shared.navigateToDocReaderVC(from: self, url: url!)
-        }
-    }
-}
-
-extension HomeVC {
-    func authenticateUser() {
-        let context = LAContext()
-        var error: NSError?
-        if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
-            let reason = "Use Face ID to unlock the app"
-            LoaderView.shared.show(on: self.view)
-            context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reason) { success, authenticationError in
-                DispatchQueue.main.async {
-                    LoaderView.shared.hide()
-                    if success {
-                        Logger.print("Authentication successful" , level: .success)
-                    } else {
-                        Logger.print("Authentication failed", level: .error)
-                    }
-                }
-            }
-        }
-        else {
-            Logger.print("Biometric authentication not available", level: .error)
         }
     }
 }

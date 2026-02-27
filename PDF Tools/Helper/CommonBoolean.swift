@@ -8,3 +8,4 @@
 import Foundation
 
 var isFromCameraCaptured: Bool = false
+var isPasswordProtected: Bool = true

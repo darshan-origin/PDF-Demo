@@ -84,3 +84,4 @@ class GridView: UIView {
 
 // Worked on manage favourite functionality
 // Worked on manage loader on all process.
+// Worked on passcode lock, functionality

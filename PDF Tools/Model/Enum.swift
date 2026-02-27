@@ -68,3 +68,8 @@ enum WorkItem {
     case file(FilesMetaDataModel)
     case folder(FolderModel)
 }
+
+enum EditableViewMode {
+    case general
+    case date
+}

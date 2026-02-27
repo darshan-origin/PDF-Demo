@@ -27,6 +27,8 @@
 		0457B1BE2F46D52100D5F835 /* EditableImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0457B1BD2F46D52000D5F835 /* EditableImageView.swift */; };
 		0457B1C22F46D96400D5F835 /* DocumentGenSuccessVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0457B1C12F46D96400D5F835 /* DocumentGenSuccessVC.swift */; };
 		0457B1C42F46DA7200D5F835 /* DOCHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0457B1C32F46DA6C00D5F835 /* DOCHelper.swift */; };
+		0471C9352F516458005001EF /* SecurityVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0471C9342F516458005001EF /* SecurityVC.swift */; };
+		0471C9372F51646C005001EF /* SecurityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0471C9362F51646B005001EF /* SecurityManager.swift */; };
 		047BB9012F480E5000731570 /* MergeVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047BB9002F480E5000731570 /* MergeVC.swift */; };
 		047BB9032F481DF800731570 /* cellAllFilesPDFs.xib in Resources */ = {isa = PBXBuildFile; fileRef = 047BB9022F481DF800731570 /* cellAllFilesPDFs.xib */; };
 		047BB9052F481E0800731570 /* cellAllFilesPDFs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047BB9042F481E0800731570 /* cellAllFilesPDFs.swift */; };
@@ -91,6 +93,8 @@
 		0457B1BD2F46D52000D5F835 /* EditableImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditableImageView.swift; sourceTree = "<group>"; };
 		0457B1C12F46D96400D5F835 /* DocumentGenSuccessVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentGenSuccessVC.swift; sourceTree = "<group>"; };
 		0457B1C32F46DA6C00D5F835 /* DOCHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DOCHelper.swift; sourceTree = "<group>"; };
+		0471C9342F516458005001EF /* SecurityVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityVC.swift; sourceTree = "<group>"; };
+		0471C9362F51646B005001EF /* SecurityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityManager.swift; sourceTree = "<group>"; };
 		047BB9002F480E5000731570 /* MergeVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MergeVC.swift; sourceTree = "<group>"; };
 		047BB9022F481DF800731570 /* cellAllFilesPDFs.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = cellAllFilesPDFs.xib; sourceTree = "<group>"; };
 		047BB9042F481E0800731570 /* cellAllFilesPDFs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = cellAllFilesPDFs.swift; sourceTree = "<group>"; };
@@ -163,6 +167,7 @@
 				040B74882F45E2CB00C3EBF1 /* AlertHelper.swift */,
 				044F63352F45766B00F4B9AF /* CommonBoolean.swift */,
 				0457B1C32F46DA6C00D5F835 /* DOCHelper.swift */,
+				0471C9362F51646B005001EF /* SecurityManager.swift */,
 				049F27002F514EF2002DA5CF /* FavoriteManager.swift */,
 				04251FD02F4EA8E2000B6317 /* PDFProtectionManager.swift */,
 				04AF75792F4C1A62001801D6 /* WebViewPDFDelegate.swift */,
@@ -268,6 +273,7 @@
 				0490384D2F44456800BB207E /* CameraHandlerVC.swift */,
 				041F33F92F4487DF00A7F1DB /* CropDocumentVC.swift */,
 				0450990F2F50087900F17F5F /* DocReaderVC.swift */,
+				0471C9342F516458005001EF /* SecurityVC.swift */,
 				0457B1C12F46D96400D5F835 /* DocumentGenSuccessVC.swift */,
 				04B23FA42F4596CD0023F8E3 /* EditDocumentVC.swift */,
 				04F00F1B2F45B3CE00D8338A /* ExportDocumentPopupVC.swift */,
@@ -409,6 +415,7 @@
 				04F00F1C2F45B3CE00D8338A /* ExportDocumentPopupVC.swift in Sources */,
 				0457B1C22F46D96400D5F835 /* DocumentGenSuccessVC.swift in Sources */,
 				04A12CD82F46F54C000BAAE4 /* NotificationNames.swift in Sources */,
+				0471C9372F51646C005001EF /* SecurityManager.swift in Sources */,
 				049038592F44492900BB207E /* PermissionManager.swift in Sources */,
 				049038602F444C2100BB207E /* ThreadManager.swift in Sources */,
 				041043A42F4C07950092B577 /* WebViewVC.swift in Sources */,
@@ -421,6 +428,7 @@
 				04251FD32F4EEC9A000B6317 /* CommonImageViewerVC.swift in Sources */,
 				04F00F1A2F45ADD900D8338A /* UIImage.swift in Sources */,
 				04A9AA102F444330005CDB50 /* SceneDelegate.swift in Sources */,
+				0471C9352F516458005001EF /* SecurityVC.swift in Sources */,
 				0490385B2F444A3400BB207E /* LogsManager.swift in Sources */,
 				040B74892F45E2D000C3EBF1 /* AlertHelper.swift in Sources */,
 				04AF757A2F4C1A65001801D6 /* WebViewPDFDelegate.swift in Sources */,
