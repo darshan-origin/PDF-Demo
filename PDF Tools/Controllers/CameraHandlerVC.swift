@@ -40,48 +40,27 @@ class CameraHandlerVC: UIViewController, UIImagePickerControllerDelegate, UINavi
     override func viewDidLoad() {
         super.viewDidLoad()
         setupCamera()
+        setupUI()
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        initUI()
+        setupUI()
         ThreadManager.shared.background {
             self.captureSession?.startRunning()
         }
     }
     
-    @IBAction func onTapped_flash(_ sender: UIButton) {
-        toggalFlashLight(sender: sender)
-    }
-    
-    @IBAction func onTapped_close(_ sender: Any) {
-        NavigationManager.shared.popViewController(from: self)
-    }
-    
-    @IBAction func onTapped_cameraCapture(_ sender: Any) {
-        let settings = AVCapturePhotoSettings(format: [AVVideoCodecKey: AVVideoCodecType.jpeg])
-        stillImageOutput?.capturePhoto(with: settings, delegate: self)
-    }
+    @IBAction func onTapped_flash(_ sender: UIButton) { toggalFlashLight(sender: sender) }
+    @IBAction func onTapped_close(_ sender: Any) { NavigationManager.shared.popViewController(from: self) }
+    @IBAction func onTapped_cameraCapture(_ sender: Any) { stillImageOutput?.capturePhoto(with: AVCapturePhotoSettings(format: [AVVideoCodecKey: AVVideoCodecType.jpeg]), delegate: self) }
     
     @IBAction func onTapped_gridView(_ sender: Any) {
         isGridShow.toggle()
-        ThreadManager.shared.main { [self] in
-            if isGridShow {
-                setupGridView()
-            }
-            else {
-                gridView.removeFromSuperview()
-            }
-        }
+        if isGridShow { setupGridView() } else { gridView.removeFromSuperview() }
     }
     
-    @IBAction func onTapped_photoPicker(_ sender: Any) {
-        configPhotosOpening()
-    }
-    
-    @IBAction func onTapped_selectedImages(_ sender: Any) {
-        isFromCameraCaptured = false
-        self.navigateToCropDocVC(img: nil, imgs: selectedImages, from: self)
-    }
+    @IBAction func onTapped_photoPicker(_ sender: Any) { configPhotosOpening() }
+    @IBAction func onTapped_selectedImages(_ sender: Any) { isFromCameraCaptured = false; navigateToCropDocVC(img: nil, imgs: selectedImages, from: self) }
     
     deinit {
         self.captureSession?.stopRunning()
@@ -89,266 +68,113 @@ class CameraHandlerVC: UIViewController, UIImagePickerControllerDelegate, UINavi
 }
 
 extension CameraHandlerVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return arrCameraFeaturesTitle.count
-    }
-    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int { arrCameraFeaturesTitle.count }
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = self.collectionViewFeatures.dequeueReusableCell(withReuseIdentifier: "cellCameraFeatures", for: indexPath) as! cellCameraFeatures
-        let model = arrCameraFeaturesTitle[indexPath.row]
-        cell.lbl_featuresTitle.text = model
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cellCameraFeatures", for: indexPath) as! cellCameraFeatures
+        cell.lbl_featuresTitle.text = arrCameraFeaturesTitle[indexPath.row]
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let model = arrCameraFeaturesTitle[indexPath.row]
-        Logger.print(model, level: .debug)
-        collectionView.scrollToItem(at: indexPath,at: .centeredHorizontally, animated: true)
-        if let cell = collectionView.cellForItem(at: indexPath) as? cellCameraFeatures {
-            cell.isSelected = true
-        }
-        
-        if indexPath.row == 2 {
-            self.view_passport.isHidden = false
-            self.view_qr.isHidden = true
-            self.view_idCard.isHidden = true
-            self.btn_grid.isHidden = true
-            if isGridShow {
-                self.gridView.removeFromSuperview()
-            }
-        } else if indexPath.row == 3 {
-            self.view_idCard.isHidden = false
-            self.view_qr.isHidden = true
-            self.view_passport.isHidden = true
-            self.btn_grid.isHidden = true
-            if isGridShow {
-                self.gridView.removeFromSuperview()
-            }
-        } else if indexPath.row == 4 {
-            self.btn_photoGallary.isHidden = true
-            self.btn_grid.isHidden = true
-            self.btn_cameraCapture.isHidden = true
-            self.view_qr.isHidden = false
-            self.view_passport.isHidden = true
-            self.view_idCard.isHidden = true
-            self.btn_grid.isHidden = true
-            if isGridShow {
-                self.gridView.removeFromSuperview()
-            }
-        }
-        else {
-            self.view_qr.isHidden = true
-            self.view_idCard.isHidden = true
-            self.view_passport.isHidden = true
-            self.btn_photoGallary.isHidden = false
-            self.btn_grid.isHidden = false
-            self.btn_cameraCapture.isHidden = false
-        }
-        
+        collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
+        let mode = indexPath.row
+        [view_passport, view_idCard, view_qr].enumerated().forEach { $0.element.isHidden = $0.offset != mode - 2 }
+        [btn_photoGallary, btn_grid, btn_cameraCapture].forEach { $0.isHidden = mode == 4 }
+        if mode >= 2 { btn_grid.isHidden = true; if isGridShow { gridView?.removeFromSuperview() } }
         collectionView.reloadItems(at: [indexPath])
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: 200, height: 50)
-    }
-    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize { CGSize(width: 200, height: 50) }
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        let cellWidth: CGFloat = 200
-        let inset = (collectionView.frame.width / 2) - (cellWidth / 2)
+        let inset = (collectionView.frame.width - 200) / 2
         return UIEdgeInsets(top: 0, left: inset, bottom: 0, right: inset)
     }
 }
 
 extension CameraHandlerVC {
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        let originalImage = info[.originalImage]
-        Logger.print("Selected image metadata >>>>> \(originalImage.debugDescription)", level: .info)
-        selectedImages.append(originalImage as? UIImage ?? UIImage())
-        Logger.print("Stored Last selected image >>>>> \(selectedImages)", level: .success)
-        imgCount += 1
-        if !selectedImages.isEmpty {
-            self.view_bgSelectedimageCount.isHidden = false
-            self.lbl_selectedImageCount.isHidden = false
-            self.lbl_selectedImageCount.text = "\(imgCount)"
+        if let img = info[.originalImage] as? UIImage {
+            selectedImages.append(img); imgCount += 1
+            view_bgSelectedimageCount.isHidden = false
+            lbl_selectedImageCount.isHidden = false
+            lbl_selectedImageCount.text = "\(imgCount)"
         }
-        dismiss(animated: true, completion: nil)
+        dismiss(animated: true)
     }
     
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
-        if let e = error {
-            Logger.print(e, level: .error)
-        } else if let photoData = photo.fileDataRepresentation(), let photoImage = UIImage(data: photoData) {
-            Logger.print("Camera image captured and data >>>>>> \(photoData)", level: .success)
-            isFromCameraCaptured = true
-            self.navigateToCropDocVC(img: photoImage, imgs: nil, from: self)
+        if let data = photo.fileDataRepresentation(), let img = UIImage(data: data) {
+            isFromCameraCaptured = true; navigateToCropDocVC(img: img, imgs: nil, from: self)
         }
     }
-    
-    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-        dismiss(animated: true, completion: nil)
-    }
-    
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) { dismiss(animated: true) }
 }
 
 extension CameraHandlerVC {
-    
-    func initUI() {
-        ThreadManager.shared.main { [self] in
-            collectionViewFeatures.register(UINib(nibName: "cellCameraFeatures", bundle: .main), forCellWithReuseIdentifier: "cellCameraFeatures")
-            collectionViewFeatures.delegate = self
-            collectionViewFeatures.dataSource = self
-            collectionViewFeatures.isPagingEnabled = false
-            collectionViewFeatures.isScrollEnabled = false
-            collectionViewFeatures.reloadData()
-            
-            view_dot.layer.cornerRadius = view_dot.frame.height / 2
-            captureViewsConfig(view: view_qr)
-            captureViewsConfig(view: view_passport)
-            captureViewsConfig(view: view_idCard)
-            view_bgSelectedimageCount.layer.cornerRadius = view_bgSelectedimageCount.frame.height / 2
-            view_bgSelectedimageCount.layer.borderWidth = 1
-            view_bgSelectedimageCount.layer.borderColor = UIColor.lightGray.cgColor
-            lbl_selectedImageCount.layer.cornerRadius = lbl_selectedImageCount.frame.height / 2
-            lbl_selectedImageCount.clipsToBounds = true
-            
-            if selectedImages.isEmpty {
-                lbl_selectedImageCount.isHidden = true
-                view_bgSelectedimageCount.isHidden = true
-            }
+    func setupUI() {
+        collectionViewFeatures.register(UINib(nibName: "cellCameraFeatures", bundle: .main), forCellWithReuseIdentifier: "cellCameraFeatures")
+        collectionViewFeatures.delegate = self; collectionViewFeatures.dataSource = self
+        [view_dot, view_bgSelectedimageCount, lbl_selectedImageCount].forEach { $0?.layer.cornerRadius = $0!.frame.height / 2 }
+        [view_qr, view_passport, view_idCard].forEach { 
+            $0.layer.borderWidth = 2; $0.layer.borderColor = UIColor.white.cgColor
+            $0.backgroundColor = UIColor.lightGray.withAlphaComponent(0.5); $0.isHidden = true 
         }
+        updateSelectedImageCount()
     }
     
     func navigateToCropDocVC(img: UIImage?, imgs: [UIImage]?, from vc: UIViewController) {
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        if let cropVC = storyboard.instantiateViewController(withIdentifier: "CropDocumentVC") as? CropDocumentVC {
-            
-            if let singleImage = img {
-                cropVC.capturedCameraImage = singleImage
+        if let cropVC = storyboard?.instantiateViewController(withIdentifier: "CropDocumentVC") as? CropDocumentVC {
+            cropVC.capturedCameraImage = img; cropVC.selectedPassedImages = imgs!
+            cropVC.onImagesUpdated = { [weak self] imgs in
+                self?.selectedImages = imgs; self?.imgCount = imgs.count; self?.updateSelectedImageCount()
             }
-            if let imagesArray = imgs {
-                cropVC.selectedPassedImages = imagesArray
-            }
-            
-            // Pass the closure instead of delegate
-            cropVC.onImagesUpdated = { [weak self] updatedImages in
-                guard let self = self else { return }
-                self.selectedImages = updatedImages
-                self.imgCount = updatedImages.count
-                self.lbl_selectedImageCount.text = "\(self.imgCount)"
-                self.view_bgSelectedimageCount.isHidden = updatedImages.isEmpty
-                self.lbl_selectedImageCount.isHidden = updatedImages.isEmpty
-            }
-            
             vc.navigationController?.pushViewController(cropVC, animated: true)
         }
     }
     
+    func updateSelectedImageCount() {
+        let hide = selectedImages.isEmpty
+        view_bgSelectedimageCount.isHidden = hide; lbl_selectedImageCount.isHidden = hide
+        lbl_selectedImageCount.text = "\(imgCount)"
+    }
     
     func setupCamera() {
-        captureSession = AVCaptureSession()
-        captureSession?.sessionPreset = .photo
-        guard let backCamera = AVCaptureDevice.default(for: AVMediaType.video) else {
-            Logger.print("Unable to access back camera!", level: .error)
-            return
+        captureSession = AVCaptureSession(); captureSession?.sessionPreset = .photo
+        guard let device = AVCaptureDevice.default(for: .video), let input = try? AVCaptureDeviceInput(device: device) else { return }
+        stillImageOutput = AVCapturePhotoOutput()
+        if captureSession!.canAddInput(input) && captureSession!.canAddOutput(stillImageOutput!) {
+            captureSession!.addInput(input); captureSession!.addOutput(stillImageOutput!)
+            previewLayer = AVCaptureVideoPreviewLayer(session: captureSession!)
+            previewLayer?.videoGravity = .resizeAspectFill; previewLayer?.connection?.videoRotationAngle = 90
+            view_camera.layer.addSublayer(previewLayer!); previewLayer?.frame = view_camera.bounds
         }
-        
-        do {
-            let input = try AVCaptureDeviceInput(device: backCamera)
-            stillImageOutput = AVCapturePhotoOutput()
-            
-            if captureSession?.canAddInput(input) == true && captureSession?.canAddOutput(stillImageOutput!) == true {
-                captureSession?.addInput(input)
-                captureSession?.addOutput(stillImageOutput!)
-                setupLivePreview()
-            }
-        } catch let error {
-            Logger.print("Error Unable to initialize back camera: \(error.localizedDescription)", level: .error)
-        }
-    }
-    
-    func setupLivePreview() {
-        previewLayer = AVCaptureVideoPreviewLayer(session: captureSession!)
-        previewLayer?.videoGravity = .resizeAspectFill
-        previewLayer?.connection?.videoRotationAngle = 90
-        view_camera.layer.addSublayer(previewLayer!)
-        
-        ThreadManager.shared.backgroundUserInitiated { [weak self] in
-            self?.captureSession?.startRunning()
-            ThreadManager.shared.main {
-                self?.previewLayer?.frame = self?.view_camera.bounds ?? CGRect.zero
-            }
-        }
-    }
-    
-    
-    func captureViewsConfig(view: UIView) {
-        view.layer.borderWidth = 2
-        view.layer.borderColor = UIColor.white.cgColor
-        view.backgroundColor = UIColor.lightGray.withAlphaComponent(0.5)
-        view.isHidden = true
     }
     
     func setupGridView() {
-        gridView = GridView()
-        gridView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(gridView)
-        
-        NSLayoutConstraint.activate([
-            gridView.topAnchor.constraint(equalTo: view.topAnchor),
-            gridView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            gridView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            gridView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
-        ])
+        gridView = GridView(); gridView.translatesAutoresizingMaskIntoConstraints = false; view.addSubview(gridView)
+        NSLayoutConstraint.activate([gridView.topAnchor.constraint(equalTo: view.topAnchor), gridView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+                                   gridView.leadingAnchor.constraint(equalTo: view.leadingAnchor), gridView.trailingAnchor.constraint(equalTo: view.trailingAnchor)])
     }
     
     func configPhotosOpening() {
-        PermissionManager.shared.requestCameraPermission { [self] granted in
-            if granted {
-                Logger.print("Photos Permission Allowed", level: .success)
-                let imagePicker = UIImagePickerController()
-                imagePicker.delegate = self
-                imagePicker.sourceType = .photoLibrary
-                present(imagePicker, animated: true, completion: nil)
-            } else {
-                Logger.print("Photos Permission Denied", level: .error)
-                PermissionManager.shared.openSettings()
-            }
+        PermissionManager.shared.requestCameraPermission { [weak self] granted in
+            guard granted else { PermissionManager.shared.openSettings(); return }
+            let picker = UIImagePickerController(); picker.delegate = self; picker.sourceType = .photoLibrary
+            self?.present(picker, animated: true)
         }
     }
     
     func toggalFlashLight(sender: UIButton) {
-        let device = AVCaptureDevice.default(for: AVMediaType.video)
-        if let device = device, device.hasTorch {
-            do {
-                try device.lockForConfiguration()
-                ThreadManager.shared.main() { [self] in
-                    
-                    if isFlashOn {
-                        device.torchMode = .off
-                        isFlashOn = false
-                        Logger.print("Flash OFF", level: .success)
-                        btn_flash.setImage(UIImage(named: "ic_flashON"), for: .normal)
-                    } else {
-                        device.torchMode = .on
-                        isFlashOn = true
-                        Logger.print("Flash ON", level: .success)
-                        btn_flash.setImage(UIImage(named: "ic_flashOFF"), for: .normal)
-                    }
-                    device.unlockForConfiguration()
-                }
-            } catch {
-                Logger.print("Could not hold torch configuration", level: .error)
-            }
+        if let device = AVCaptureDevice.default(for: .video), device.hasTorch, (try? device.lockForConfiguration()) != nil {
+            isFlashOn.toggle(); device.torchMode = isFlashOn ? .on : .off
+            btn_flash.setImage(UIImage(named: isFlashOn ? "ic_flashOFF" : "ic_flashON"), for: .normal)
+            device.unlockForConfiguration()
         }
     }
 }
 
 extension CameraHandlerVC: CropDocumentVCDelegate {
     func cropDocumentVC(_ controller: CropDocumentVC, didUpdateImages images: [UIImage]) {
-        self.selectedImages = images
-        self.imgCount = images.count
-        self.lbl_selectedImageCount.text = "\(self.imgCount)"
-        self.view_bgSelectedimageCount.isHidden = self.selectedImages.isEmpty
-        self.lbl_selectedImageCount.isHidden = self.selectedImages.isEmpty
+        selectedImages = images; imgCount = images.count; updateSelectedImageCount()
     }
 }

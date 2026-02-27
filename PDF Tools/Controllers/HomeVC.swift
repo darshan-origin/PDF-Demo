@@ -88,23 +88,22 @@ extension HomeVC {
     func authenticateUser() {
         let context = LAContext()
         var error: NSError?
-        
         if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
-            
             let reason = "Use Face ID to unlock the app"
-            
-            context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics,
-                                   localizedReason: reason) { success, authenticationError in
+            LoaderView.shared.show(on: self.view)
+            context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reason) { success, authenticationError in
                 DispatchQueue.main.async {
+                    LoaderView.shared.hide()
                     if success {
-                        print("Authentication successful")
+                        Logger.print("Authentication successful" , level: .success)
                     } else {
-                        print("Authentication failed")
+                        Logger.print("Authentication failed", level: .error)
                     }
                 }
             }
-        } else {
-            print("Biometric authentication not available")
+        }
+        else {
+            Logger.print("Biometric authentication not available", level: .error)
         }
     }
 }

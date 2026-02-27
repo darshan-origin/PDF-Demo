@@ -24,156 +24,67 @@ class SelectedDocViewerVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        Logger.print("Received type >>>>> \(type)", level: .info)
-        ThreadManager.shared.main { [self] in
-            initUI()
-            if type == "TXT" {
-                readTxtFile()
-            } else if type == "XLSX" {
-                readXlsxFile()
-            } else if type == "DOCX" {
-                readWordsFile()
-            } else if type == "PPT" {
-                readPPTFile()
-            } else if type == "PDF_IMG" {
-                btn_save.setTitle("Make PPT", for: .normal)
-                readPDF()
-            }
+        lbl_selectedFileName.text = fileURL?.lastPathComponent
+        if type == "PDF_IMG" { btn_save.setTitle("Make PPT", for: .normal) }
+        
+        switch type {
+        case "TXT": if let t = DOCHelper.shared.readTextFile(from: fileURL!) { txtView_txtFileViewer.text = t }
+        case "XLSX": try? extractedTableData = DOCHelper.shared.extractXLSXData(fileURL: fileURL!)
+        case "DOCX", "PPT", "PDF_IMG": previewManager.showPreview(from: self, with: fileURL!)
+        default: break
         }
     }
     
-    @IBAction func onTapped_back(_ sender: Any) {
-        NavigationManager.shared.popViewController(from: self)
-    }
+    @IBAction func onTapped_back(_ sender: Any) { NavigationManager.shared.popViewController(from: self) }
     
     @IBAction func onTapped_makePDF(_ sender: Any) {
-        if type == "TXT" {
-            generatePDFfromTXT()
-        } else if type == "XLSX" {
-            generatePDFfromXLSX()
-        } else if type == "DOCX" {
-            generatePDFfromDOCX()
-        } else if type == "PPT" {
-            generatePDF()
-        } else if type == "PDF_IMG" {
-            generateIMG_PDF()
+        switch type {
+        case "TXT": generatePDFfromTXT()
+        case "XLSX": generatePDFfromXLSX()
+        case "DOCX": generatePDFfromDOCX()
+        case "PPT": generatePPTToPDF()
+        case "PDF_IMG": convertPDFToImages()
+        default: break
         }
     }
 }
 
 extension SelectedDocViewerVC {
-    
-    func initUI() {
-        lbl_selectedFileName.text = fileURL?.lastPathComponent
-    }
-    
-    // MARK: - TXT
-    func readTxtFile() {
-        if let fileText =  DOCHelper.shared.readTextFile(from: fileURL!) {
-            txtView_txtFileViewer.text = fileText
-        } else {
-            txtView_txtFileViewer.text = "Could not read file content."
-        }
-    }
-    
     func generatePDFfromTXT() {
-        ThreadManager.shared.background {
-            Task {
-                let textData = DOCHelper.shared.generatePDFfromText(from: self.txtView_txtFileViewer.text ?? "")
-                let fetchTimeAndDataForFileName = DOCHelper.shared.getCustomFormattedDateTime()
-                try FileStorageManager.store(textData, at: "\(fetchTimeAndDataForFileName).pdf", in: .documents)
-                Logger.print("PDF saved successfully at >>>>>> \(String(describing: textData))", level: .success)
-                let fileURL = FileStorageManager.url(for: "\(fetchTimeAndDataForFileName).pdf", in: .documents)
-                Logger.print("Final stored pdf url: >>>>>> \(fileURL)", level: .success)
-                
-                ThreadManager.shared.main {
-                    NavigationManager.shared.navigateToPDFViewVC(from: self, url: "\(fileURL)")
-                }
-            }
-        }
-    }
-    
-    // MARK: - XLSX
-    func readXlsxFile() {
-        do {
-            extractedTableData = try DOCHelper.shared.extractXLSXData(fileURL: fileURL!)
-            Logger.print("Data Extracted. Rows: \(extractedTableData.count)" ,level: .success)
-        } catch {
-            Logger.print("Extraction failed: \(error)", level: .error)
-        }
+        performAction { DOCHelper.shared.generatePDFfromText(from: self.txtView_txtFileViewer.text ?? "") }
     }
     
     func generatePDFfromXLSX() {
-        ThreadManager.shared.background { [self] in
-            Task {
-                guard !extractedTableData.isEmpty else {
-                    Logger.print("No data available. Please pick an excel file first", level: .warning)
-                    return
-                }
-                
-                let fetchTimeAndDataForFileName = DOCHelper.shared.getCustomFormattedDateTime()
-                let pdfData = DOCHelper.shared.generatePDFFromTable(data: extractedTableData)
-                
-                try FileStorageManager.store(pdfData, at: "\(fetchTimeAndDataForFileName).pdf", in: .documents)
-                Logger.print("PDF saved successfully at >>>>>> \(String(describing: pdfData))", level: .success)
-                
-                let fileURL = FileStorageManager.url(for: "\(fetchTimeAndDataForFileName).pdf", in: .documents)
-                Logger.print("Final stored pdf: >>>>>> \(fileURL)", level: .success)
-                
-                ThreadManager.shared.main {
-                    NavigationManager.shared.navigateToPDFViewVC(from: self, url: "\(fileURL)")
-                }
-            }
-        }
+        guard !extractedTableData.isEmpty else { return }
+        performAction { DOCHelper.shared.generatePDFFromTable(data: self.extractedTableData) }
     }
     
-    
-    // MARK: - DOCX
-    func readWordsFile() {
-        previewManager.showPreview(from: self, with: fileURL!)
+    func generatePPTToPDF() {
+        Task { if let data = await DOCHelper.shared.generatePDF(from: fileURL!) { self.saveAndOpenPDF(data) } }
     }
     
-    // MARK: - PPT
-    func readPPTFile() {
-        previewManager.showPreview(from: self, with: fileURL!)
-    }
-    
-    func generatePDF() {
-        Task {
-            if let pdfData = await DOCHelper.shared.generatePDF(from: fileURL!) {
-                let fileName = DOCHelper.shared.getCustomFormattedDateTime()
-                do {
-                    try FileStorageManager.store(pdfData, at: "\(fileName).pdf", in: .documents)
-                    let finalURL = FileStorageManager.url(for: "\(fileName).pdf",in: .documents)
-                    Logger.print("PDF Generated successfully: \(String(describing: fileURL))", level: .success)
-                    await MainActor.run {
-                        NavigationManager.shared.navigateToPDFViewVC(from: self,url: "\(finalURL)")
-                    }
-                    
-                } catch {
-                    Logger.print("Failed saving PDF: \(error)", level: .error)
-                }
-            }
-        }
-    }
-    
-    
-    // MARK: - PDF
-    
-    func readPDF() {
-        previewManager.showPreview(from: self, with: fileURL!)
-    }
-    
-    func generateIMG_PDF() {
+    func convertPDFToImages() {
         ThreadManager.shared.background {
-            let data = DOCHelper.shared.convertPDFToImages(pdfURL: self.fileURL!)
-            if let urls = FileStorageManager.saveImagesToDocuments(images: data) {
-                print("Saved at:", urls)
-                ThreadManager.shared.main {
-                    NavigationManager.shared.popROOTViewController(from: self)
-                }
+            if FileStorageManager.saveImagesToDocuments(images: DOCHelper.shared.convertPDFToImages(pdfURL: self.fileURL!)) != nil {
+                ThreadManager.shared.main { NavigationManager.shared.popROOTViewController(from: self) }
             }
         }
+    }
+
+    private func performAction(_ action: @escaping () -> Data?) {
+        ThreadManager.shared.background {
+            guard let data = action() else { return }
+            ThreadManager.shared.main { self.saveAndOpenPDF(data) }
+        }
+    }
+
+    func saveAndOpenPDF(_ data: Data) {
+        let name = "\(DOCHelper.shared.getCustomFormattedDateTime()).pdf"
+        do {
+            try FileStorageManager.store(data, at: name, in: .documents)
+            let url = FileStorageManager.url(for: name, in: .documents)
+            NavigationManager.shared.navigateToPDFViewVC(from: self, url: "\(url)")
+        } catch { Logger.print("Save failed: \(error)", level: .error) }
     }
 }
 
@@ -182,77 +93,27 @@ extension SelectedDocViewerVC {
     func generatePDFfromDOCX() {
         guard let url = fileURL else { return }
         let isScoped = url.startAccessingSecurityScopedResource()
-        
-        do {
-            let fileData = try Data(contentsOf: url)
+        if let data = try? Data(contentsOf: url) {
             if isScoped { url.stopAccessingSecurityScopedResource() }
-            let cacheFolder = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
-            let localURL = cacheFolder.appendingPathComponent("temp_convert.docx")
-            try fileData.write(to: localURL, options: .atomic)
-            setupAndLoadWebView(with: localURL)
-            
-        } catch {
-            if isScoped { url.stopAccessingSecurityScopedResource() }
-        }
+            let localURL = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!.appendingPathComponent("temp.docx")
+            try? data.write(to: localURL)
+            webView?.removeFromSuperview()
+            let wv = WKWebView(frame: view.bounds); wv.navigationDelegate = self; wv.alpha = 0.01
+            view.addSubview(wv); self.webView = wv; wv.load(URLRequest(url: localURL))
+        } else if isScoped { url.stopAccessingSecurityScopedResource() }
     }
 
-    private func setupAndLoadWebView(with url: URL) {
-        if self.webView != nil {
-            self.webView?.removeFromSuperview()
-        }
-        
-        let wv = WKWebView(frame: self.view.bounds)
-        wv.navigationDelegate = self
-        wv.alpha = 0.01
-        self.view.addSubview(wv)
-        self.webView = wv
-        
-        let request = URLRequest(url: url)
-        wv.load(request)
-    }
-    
     private func createMultiPagePDF() {
-        guard let wv = self.webView else { return }
-        let pageRect = CGRect(x: 0, y: 0, width: 612, height: 792)
-        let printableRect = pageRect.insetBy(dx: 20, dy: 20)
-        let renderer = UIPrintPageRenderer()
-        let formatter = wv.viewPrintFormatter()
-        
-        renderer.addPrintFormatter(formatter, startingAtPageAt: 0)
+        guard let wv = webView else { return }
+        let pageRect = CGRect(x: 0, y: 0, width: 612, height: 792), renderer = UIPrintPageRenderer()
+        renderer.addPrintFormatter(wv.viewPrintFormatter(), startingAtPageAt: 0)
         renderer.setValue(NSValue(cgRect: pageRect), forKey: "paperRect")
-        renderer.setValue(NSValue(cgRect: printableRect), forKey: "printableRect")
-        
-        let pdfData = NSMutableData()
-        UIGraphicsBeginPDFContextToData(pdfData, pageRect, nil)
-        
-        for i in 0..<renderer.numberOfPages {
-            UIGraphicsBeginPDFPage()
-            renderer.drawPage(at: i, in: pageRect)
-        }
-        
-        UIGraphicsEndPDFContext()
-        wv.removeFromSuperview()
-        self.webView = nil
-        saveOrHandlePDF(pdfData as Data)
-    }
-    
-    func saveOrHandlePDF(_ data: Data) {
-        let fileName = DOCHelper.shared.getCustomFormattedDateTime()
-        let fullFileName = "\(fileName).pdf"
-        
-        do {
-            try FileStorageManager.store(data, at: fullFileName, in: .documents)
-            let finalURL = FileStorageManager.url(for: fullFileName, in: .documents)
-            
-            Logger.print("PDF Generated successfully", level: .success)
-            
-            ThreadManager.shared.main {
-                NavigationManager.shared.navigateToPDFViewVC(from: self, url: finalURL.absoluteString)
-            }
-            
-        } catch {
-            Logger.print("Failed saving PDF: \(error)", level: .error)
-        }
+        renderer.setValue(NSValue(cgRect: pageRect.insetBy(dx: 20, dy: 20)), forKey: "printableReact")
+        let data = NSMutableData()
+        UIGraphicsBeginPDFContextToData(data, pageRect, nil)
+        for i in 0..<renderer.numberOfPages { UIGraphicsBeginPDFPage(); renderer.drawPage(at: i, in: pageRect) }
+        UIGraphicsEndPDFContext(); wv.removeFromSuperview(); self.webView = nil
+        saveAndOpenPDF(data as Data)
     }
 }
 

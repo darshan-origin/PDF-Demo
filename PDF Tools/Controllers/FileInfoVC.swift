@@ -8,45 +8,35 @@ class FileInfoVC: UIViewController {
     @IBOutlet weak var lbl_created: UILabel!
     @IBOutlet weak var view_base: UIView!
     
-    var name = ""
-    var pages = ""
-    var fileSize = Int64()
-    var created = ""
+    var name = "", pages = "", created = ""
+    var fileSize: Int64 = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        Logger.print(name, level: .info)
-        Logger.print(pages, level: .info)
-        Logger.print(fileSize, level: .info)
-        Logger.print(created, level: .info)
+        setupUI()
+    }
+    
+    private func setupUI() {
+        Logger.print("\(name) | \(pages) | \(fileSize) | \(created)", level: .info)
         
-        view.backgroundColor = UIColor.black.withAlphaComponent(0.7)
+        view.backgroundColor = .black.withAlphaComponent(0.7)
         view_base.layer.cornerRadius = 12
-        
-        let formattedSize = ByteCountFormatter.string(fromByteCount: fileSize, countStyle: .file)
         
         lbl_name.text = name
         lbl_page.text = "\(pages) Pages"
-        lbl_fileSize.text = "\(formattedSize)"
+        lbl_fileSize.text = ByteCountFormatter.string(fromByteCount: fileSize, countStyle: .file)
         
-        let inputFormatter = DateFormatter()
-        inputFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss Z"
-        inputFormatter.locale = Locale(identifier: "en_US_POSIX")
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss Z"
         
-        if let date = inputFormatter.date(from: created) {
-            
-            let outputFormatter = DateFormatter()
-            outputFormatter.dateFormat = "dd-MMM-yyyy 'at' HH:mm"
-            outputFormatter.locale = Locale(identifier: "en_US_POSIX")
-            
-            let formattedDate = outputFormatter.string(from: date)
-            lbl_created.text = formattedDate
+        if let date = formatter.date(from: created) {
+            formatter.dateFormat = "dd-MMM-yyyy 'at' HH:mm"
+            lbl_created.text = formatter.string(from: date)
         }
-        
     }
     
     @IBAction func onTapped_close(_ sender: Any) {
-        self.dismiss(animated: true)
+        dismiss(animated: true)
     }
 }
-

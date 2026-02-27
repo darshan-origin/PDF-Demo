@@ -38,7 +38,21 @@ class TabVC: UITabBarController {
             selectedImage: UIImage(systemName: "doc.fill")
         )
         
-        viewControllers = [homeNav, editNav]
+        
+        guard let favVC = storyboard.instantiateViewController(withIdentifier: "FavVC") as? FavVC else {
+            fatalError("FavVC not found")
+        }
+        
+        let favNav = UINavigationController(rootViewController: favVC)
+        favNav.setNavigationBarHidden(true, animated: false)
+        favNav.navigationBar.prefersLargeTitles = false
+        favNav.tabBarItem = UITabBarItem(
+            title: "Favourites",
+            image: UIImage(systemName: "heart"),
+            selectedImage: UIImage(systemName: "heart.fill")
+        )
+        
+        
+        viewControllers = [homeNav, editNav, favNav]
     }
-
 }

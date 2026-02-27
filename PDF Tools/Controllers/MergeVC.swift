@@ -17,32 +17,16 @@ class MergeVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        initUI()
-    }
-    
-    func initUI() {
         view_topNav.applyShadow()
-        
-        if isSplit {
-            lbl_screenTitle.text = "Split PDF"
-            btn_actionButtonm.setTitle("Split PDF", for: .normal)
-        } else if isOrganize {
+        lbl_screenTitle.text = isSplit ? "Split PDF" : (isOrganize ? "Organize PDF" : "Merge PDF")
+        btn_actionButtonm.setTitle(lbl_screenTitle.text, for: .normal)
+        if isOrganize {
             tableview_allPDFs.isEditing = true
             pageOrder = Array(0..<pdfPageCount)
-            lbl_screenTitle.text = "Organize PDF"
-            btn_actionButtonm.setTitle("Organize PDF", for: .normal)
-        } else {
-            lbl_screenTitle.text = "Merge PDF"
-            btn_actionButtonm.setTitle("Merge PDF", for: .normal)
         }
-        tableviewConfig()
-        tableview_allPDFs.reloadData()
-    }
-    
-    func tableviewConfig() {
         tableview_allPDFs.register(UINib(nibName: "cellAllFilesPDFs", bundle: .main), forCellReuseIdentifier: "cellAllFilesPDFs")
-        tableview_allPDFs.delegate = self
         tableview_allPDFs.dataSource = self
+        tableview_allPDFs.delegate = self
     }
     
     @IBAction func onTapped_back(_ sender: Any) {
@@ -50,86 +34,34 @@ class MergeVC: UIViewController {
     }
     
     @IBAction func onTapped_merge(_ sender: Any) {
-        
-        if isOrganize {
-            guard let sourceURL = fileURL else { return }
-            let orderedPages = pageOrder.map { $0 + 1 }
-            
-            ThreadManager.shared.background { [weak self] in
-                guard let self else { return }
-                
-                if let data = DOCHelper.shared.reorderPDF( sourceURL: sourceURL, pageNumbers: orderedPages ) {
-                    do {
-                        let newName = "\(DOCHelper.shared.getCustomFormattedDateTime())_organized"
-                        try FileStorageManager.store( data, at: "\(newName).pdf", in: .documents)
-                        
-                        let storedURL = FileStorageManager.url( for: "\(newName).pdf", in: .documents)
-                        
-                        ThreadManager.shared.main {
-                            NavigationManager.shared.navigateToPDFViewVC( from: self,url: "\(storedURL)")
-                        }
-                    } catch {
-                        Logger.print("Error storing organized PDF: \(error)", level: .error)
-                    }
-                }
+        if isOrganize || isSplit {
+            guard let url = fileURL else { return }
+            let pages = isOrganize ? pageOrder.map { $0 + 1 } : selectedIndexes.sorted().map { $0 + 1 }
+            performPDFAction(title: isOrganize ? "organized" : "splitted") {
+                self.isOrganize ? DOCHelper.shared.reorderPDF(sourceURL: url, pageNumbers: pages) : 
+                           DOCHelper.shared.splitPdfByPageNumbers(sourceURL: url, pageNumbers: pages)
             }
-            
-        }
-        else if isSplit {
-            
-            guard let sourceURL = fileURL else { return }
-            
-            let pageNumbers = selectedIndexes
-                .sorted()
-                .map { $0 + 1 }
-            
-            ThreadManager.shared.background { [weak self] in
-                guard let self else { return }
-                
-                if let data = DOCHelper.shared.splitPdfByPageNumbers(
-                    sourceURL: sourceURL,
-                    pageNumbers: pageNumbers
-                ) {
-                    do {
-                        let newName = "\(DOCHelper.shared.getCustomFormattedDateTime())_splitted"
-                        try FileStorageManager.store(data, at: "\(newName).pdf",in: .documents)
-                        let storedURL = FileStorageManager.url(for: "\(newName).pdf",in: .documents)
-                        ThreadManager.shared.main {
-                            NavigationManager.shared.navigateToPDFViewVC(from: self,url: "\(storedURL)")
-                        }
-                    } catch {
-                        Logger.print("Error storing split PDF: \(error)", level: .error)
-                    }
-                }
-            }
-            
         } else {
-            
-            let selectedURLs: [URL] = selectedIndexes
-                .sorted()
-                .compactMap { index in
-                    guard index < filesArray.count else { return nil }
-                    return filesArray[index].url
-                }
-            mergeingPDF(files: selectedURLs)
+            let selectedURLs = selectedIndexes.sorted().compactMap { $0 < filesArray.count ? filesArray[$0].url : nil }
+            performPDFAction(title: "merged", isMerge: true) { DOCHelper.shared.mergePDFs(from: selectedURLs) }
         }
     }
     
-    func mergeingPDF(files: [URL]) {
+    private func performPDFAction(title: String, isMerge: Bool = false, action: @escaping () -> Data?) {
+        LoaderView.shared.show(on: self.view)
         ThreadManager.shared.background { [weak self] in
-            guard let self else { return }
-            
-            let mergedFileName = "\(DOCHelper.shared.getCustomFormattedDateTime())_merged"
-            
-            if let mergedPDFData = DOCHelper.shared.mergePDFs(from: files) {
-                do {
-                    try FileStorageManager.store(mergedPDFData,at: "\(mergedFileName).pdf", in: .documents)
-                    ThreadManager.shared.main {
-                        NavigationManager.shared.popROOTViewController(from: self)
-                    }
-                } catch {
-                    Logger.print("Error storing merged PDF: \(error)", level: .error)
+            guard let self = self, let data = action() else { ThreadManager.shared.main { LoaderView.shared.hide() }; return }
+            do {
+                let name = "\(DOCHelper.shared.getCustomFormattedDateTime())_\(title)"
+                try FileStorageManager.store(data, at: "\(name).pdf", in: .documents)
+                let storedURL = FileStorageManager.url(for: "\(name).pdf", in: .documents)
+                ThreadManager.shared.main {
+                    LoaderView.shared.hide()
+                    isMerge ? NavigationManager.shared.popROOTViewController(from: self) : 
+                             NavigationManager.shared.navigateToPDFViewVC(from: self, url: "\(storedURL)")
                 }
+            } catch {
+                ThreadManager.shared.main { LoaderView.shared.hide() }
             }
         }
     }
@@ -160,47 +92,27 @@ extension MergeVC: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
         let cell = tableView.dequeueReusableCell(withIdentifier: "cellAllFilesPDFs", for: indexPath) as! cellAllFilesPDFs
-        
         if !isSplit && !isOrganize {
             let model = filesArray[indexPath.row]
             cell.lbl_fileName.text = model.name
             cell.lbl_sizeANDtime.text = model.sizeAndTime
             cell.img_thumbnail.image = model.thumbnail
-        } else if isSplit {
-            cell.lbl_fileName.text = "Page \(indexPath.row + 1)"
-            cell.lbl_sizeANDtime.text = ""
-            cell.img_thumbnail.image = UIImage(systemName: "doc.richtext")
         } else {
-            let originalPageIndex = pageOrder[indexPath.row]
-            cell.lbl_fileName.text = "Page \(originalPageIndex + 1)"
+            cell.lbl_fileName.text = "Page \((isOrganize ? pageOrder[indexPath.row] : indexPath.row) + 1)"
             cell.lbl_sizeANDtime.text = ""
             cell.img_thumbnail.image = UIImage(systemName: "doc.richtext")
         }
-        
-        if !isOrganize {
-            let isSelected = selectedIndexes.contains(indexPath.row)
-            let imageName = isSelected ? "checkmark.circle.fill" : "circle"
-            cell.btn_checkmark.setImage(UIImage(systemName: imageName), for: .normal)
-            cell.btn_checkmark.tintColor = isSelected ? .systemBlue : .systemGray3
-        } else {
-            cell.btn_checkmark.setImage(nil, for: .normal)
-        }
-        
+        let isSelected = selectedIndexes.contains(indexPath.row)
+        cell.btn_checkmark.setImage(isOrganize ? nil : UIImage(systemName: isSelected ? "checkmark.circle.fill" : "circle"), for: .normal)
+        cell.btn_checkmark.tintColor = isSelected ? .systemBlue : .systemGray3
         return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
         if isOrganize { return }
-        
-        if selectedIndexes.contains(indexPath.row) {
-            selectedIndexes.remove(indexPath.row)
-        } else {
-            selectedIndexes.insert(indexPath.row)
-        }
-        
+        if selectedIndexes.contains(indexPath.row) { selectedIndexes.remove(indexPath.row) }
+        else { selectedIndexes.insert(indexPath.row) }
         tableView.reloadRows(at: [indexPath], with: .automatic)
     }
 }

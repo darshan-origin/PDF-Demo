@@ -61,9 +61,23 @@ sd</string>
                                     <constraint firstAttribute="height" constant="8" id="XBS-aU-sHw"/>
                                 </constraints>
                             </view>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="HXA-ol-58L">
+                                <rect key="frame" x="250" y="71" width="22" height="19"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="22" id="AoE-l3-xgY"/>
+                                    <constraint firstAttribute="height" constant="22" id="FJh-1P-EDj"/>
+                                </constraints>
+                                <color key="tintColor" systemColor="systemRedColor"/>
+                                <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                <state key="normal" backgroundImage="heart" catalog="system"/>
+                                <connections>
+                                    <action selector="btnFavouriteTapped:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="7Wh-px-2Sa"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
+                            <constraint firstItem="HXA-ol-58L" firstAttribute="centerX" secondItem="nSf-uK-kap" secondAttribute="centerX" id="1dG-Rq-HNI"/>
                             <constraint firstItem="UzC-og-UjU" firstAttribute="leading" secondItem="fDq-oe-HrZ" secondAttribute="trailing" constant="18" id="AtP-LC-lxE"/>
                             <constraint firstItem="fDq-oe-HrZ" firstAttribute="leading" secondItem="6H4-9v-tBf" secondAttribute="leading" constant="10" id="Cbd-ul-tGN"/>
                             <constraint firstItem="nSf-uK-kap" firstAttribute="leading" secondItem="UzC-og-UjU" secondAttribute="trailing" constant="8" id="Jte-Ep-Who"/>
@@ -73,6 +87,7 @@ sd</string>
                             <constraint firstItem="XNM-Qo-cMo" firstAttribute="leading" secondItem="UzC-og-UjU" secondAttribute="leading" id="UM0-GF-Htk"/>
                             <constraint firstAttribute="bottom" secondItem="fDq-oe-HrZ" secondAttribute="bottom" constant="10" id="XsV-Ot-gBo"/>
                             <constraint firstItem="fDq-oe-HrZ" firstAttribute="top" secondItem="6H4-9v-tBf" secondAttribute="top" constant="10" id="YlP-Ts-I9b"/>
+                            <constraint firstItem="HXA-ol-58L" firstAttribute="top" secondItem="nSf-uK-kap" secondAttribute="bottom" constant="8" id="aum-zq-UGx"/>
                             <constraint firstItem="nSf-uK-kap" firstAttribute="top" secondItem="Wet-GP-u3r" secondAttribute="bottom" constant="10" id="oeI-FT-4uY"/>
                             <constraint firstItem="Wet-GP-u3r" firstAttribute="centerX" secondItem="nSf-uK-kap" secondAttribute="centerX" id="p23-Ys-lg6"/>
                             <constraint firstItem="UzC-og-UjU" firstAttribute="top" secondItem="fDq-oe-HrZ" secondAttribute="top" constant="8" id="s4C-4G-IUY"/>
@@ -90,6 +105,7 @@ sd</string>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <connections>
+                <outlet property="btn_favourite" destination="HXA-ol-58L" id="hkq-oy-IiR"/>
                 <outlet property="btn_moreInfo" destination="nSf-uK-kap" id="UHC-Q3-H9M"/>
                 <outlet property="img_thumbnail" destination="fDq-oe-HrZ" id="8Gl-mr-znm"/>
                 <outlet property="lbl_fileName" destination="UzC-og-UjU" id="oMA-AI-HKH"/>
@@ -102,6 +118,7 @@ sd</string>
     </objects>
     <resources>
         <image name="ellipsis.circle" catalog="system" width="128" height="123"/>
+        <image name="heart" catalog="system" width="128" height="107"/>
         <systemColor name="systemRedColor">
             <color red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>

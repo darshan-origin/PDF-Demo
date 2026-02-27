@@ -39,12 +39,8 @@ class EditDocumentVC: UIViewController, UITextFieldDelegate, UIGestureRecognizer
     private var currentCount: Int = 0
     private var bottomBaseOriginalConstant: CGFloat = 0
     private var editBaseOriginalConstant: CGFloat = 0
-    
-    /// CIFilter name selected for the current page (nil = none). Applied on save.
     private var pendingFilterName: String?
-    
-    // MARK: - Available CIFilters (grouped, display-friendly)
-    private let availableFilters: [(name: String, filterName: String)] = [
+        private let availableFilters: [(name: String, filterName: String)] = [
         ("None",               ""),
         ("Chrome",             "CIPhotoEffectChrome"),
         ("Fade",               "CIPhotoEffectFade"),
@@ -114,9 +110,7 @@ class EditDocumentVC: UIViewController, UITextFieldDelegate, UIGestureRecognizer
         }
     }
     deinit {
-        NotificationCenter.default.removeObserver(self,
-                                                  name: Notification.Name.PDF_URL_PASSING,
-                                                  object: nil)
+        NotificationCenter.default.removeObserver(self, name: Notification.Name.PDF_URL_PASSING, object: nil)
     }
     
 }
@@ -695,19 +689,20 @@ extension EditDocumentVC: SecondaryViewControllerDelegate {
     }
     
     private func imageFromText(_ text: String, font: UIFont, color: UIColor) -> UIImage? {
-        let attributes: [NSAttributedString.Key: Any] = [
+        let attr: [NSAttributedString.Key: Any] = [
             .font: font,
             .foregroundColor: color
         ]
-        let size = text.size(withAttributes: attributes)
+        let size = text.size(withAttributes: attr)
         
         UIGraphicsBeginImageContextWithOptions(size, false, 0)
-        text.draw(at: .zero, withAttributes: attributes)
+        text.draw(at: .zero, withAttributes: attr)
         let image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         
         return image
     }
+        
     
     @objc private func deselectAllOverlays() {
         selectedOverlay?.isSelected = false

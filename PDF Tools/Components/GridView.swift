@@ -82,8 +82,5 @@ class GridView: UIView {
     }
 }
 
-// Worked on mark with color tag functioanlity.
-// Worked on read any type of file.
-// Worked on file details info fetch.
-// Worked on face id to unlock app.
-// Worked on applying image filter and date editing.
+// Worked on manage favourite functionality
+// Worked on manage loader on all process.

@@ -21,11 +21,7 @@
 			</array>
 		</dict>
 	</dict>
-    <key>UIFileSharingEnabled</key>
-    <true/>
-    <key>LSSupportsOpeningDocumentsInPlace</key>
-    <true/>
-    <key>NSFaceIDUsageDescription</key>
-    <string>This app uses Face ID to securely unlock your account.</string>
+	<key>UIFileSharingEnabled</key>
+	<true/>
 </dict>
 </plist>

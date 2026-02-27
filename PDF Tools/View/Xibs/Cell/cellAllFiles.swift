@@ -8,6 +8,9 @@ class cellAllFiles: UITableViewCell {
     @IBOutlet weak var lbl_fileName: UILabel!
     @IBOutlet weak var lbl_sizeANDtime: UILabel!
     @IBOutlet weak var view_tag: UIView!
+    @IBOutlet weak var btn_favourite: UIButton!
+    
+    var didTapFavourite: (() -> Void)?
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -16,6 +19,10 @@ class cellAllFiles: UITableViewCell {
 
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
+    }
+    
+    @IBAction func btnFavouriteTapped(_ sender: UIButton) {
+        didTapFavourite?()
     }
 }
 
