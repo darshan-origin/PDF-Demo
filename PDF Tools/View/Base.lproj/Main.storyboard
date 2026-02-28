@@ -160,8 +160,21 @@
                                     <action selector="onTapped_PDFto_IMAGES:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Mlq-ed-BZW"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PGL-0T-oay">
+                                <rect key="frame" x="16" y="503" width="361" height="35"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="35" id="yH5-pO-rc3"/>
+                                </constraints>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="gray" title="PDF  to  DOC">
+                                    <fontDescription key="titleFontDescription" name="AvenirNext-DemiBold" family="Avenir Next" pointSize="14"/>
+                                </buttonConfiguration>
+                                <connections>
+                                    <action selector="onTapped_PDFto_DOC:" destination="BYZ-38-t0r" eventType="touchUpInside" id="QvS-fO-iGI"/>
+                                </connections>
+                            </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Knl-21-iBj">
-                                <rect key="frame" x="16" y="505" width="361" height="35"/>
+                                <rect key="frame" x="16" y="611" width="361" height="35"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="35" id="KGA-tV-KFM"/>
                                 </constraints>
@@ -173,12 +186,25 @@
                                     <action selector="onTapped_DOCviewer:" destination="BYZ-38-t0r" eventType="touchUpInside" id="TCQ-Wd-VFC"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mF3-wy-emr">
+                                <rect key="frame" x="16" y="550" width="361" height="35"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="35" id="f4I-dP-Rff"/>
+                                </constraints>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="gray" title="PDF  to  PPT">
+                                    <fontDescription key="titleFontDescription" name="AvenirNext-DemiBold" family="Avenir Next" pointSize="14"/>
+                                </buttonConfiguration>
+                                <connections>
+                                    <action selector="onTapped_PDFto_PPT:" destination="BYZ-38-t0r" eventType="touchUpInside" id="kER-qO-oRi"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
+                            <constraint firstItem="PGL-0T-oay" firstAttribute="leading" secondItem="UsX-bA-LJC" secondAttribute="leading" id="0U9-ia-gjZ"/>
                             <constraint firstItem="SrI-kb-2sA" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="40" id="0kc-dh-Eev"/>
-                            <constraint firstItem="Knl-21-iBj" firstAttribute="top" secondItem="UsX-bA-LJC" secondAttribute="bottom" constant="12" id="7bX-BB-PR9"/>
                             <constraint firstItem="UsX-bA-LJC" firstAttribute="top" secondItem="2SW-hE-jGz" secondAttribute="bottom" constant="30" id="7gE-7m-Ovq"/>
                             <constraint firstItem="b0A-On-pwl" firstAttribute="top" secondItem="SrI-kb-2sA" secondAttribute="bottom" constant="12" id="872-Vs-0co"/>
                             <constraint firstItem="2SW-hE-jGz" firstAttribute="top" secondItem="RbZ-HM-Yw2" secondAttribute="bottom" constant="12" id="8GI-0U-qLE"/>
@@ -188,18 +214,24 @@
                             <constraint firstItem="K5c-08-cN8" firstAttribute="trailing" secondItem="b0A-On-pwl" secondAttribute="trailing" id="Dw8-ol-sWf"/>
                             <constraint firstItem="2SW-hE-jGz" firstAttribute="leading" secondItem="RbZ-HM-Yw2" secondAttribute="leading" id="Elg-jj-AqF"/>
                             <constraint firstItem="Knl-21-iBj" firstAttribute="trailing" secondItem="UsX-bA-LJC" secondAttribute="trailing" id="G85-eS-ApJ"/>
+                            <constraint firstItem="Knl-21-iBj" firstAttribute="top" secondItem="mF3-wy-emr" secondAttribute="bottom" constant="26" id="Hsa-yv-Os6"/>
                             <constraint firstItem="2SW-hE-jGz" firstAttribute="trailing" secondItem="RbZ-HM-Yw2" secondAttribute="trailing" id="JcV-dT-gCS"/>
                             <constraint firstItem="SrI-kb-2sA" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="16" id="LNg-B3-0IJ"/>
                             <constraint firstItem="K5c-08-cN8" firstAttribute="top" secondItem="b0A-On-pwl" secondAttribute="bottom" constant="12" id="MD5-Fo-hm7"/>
+                            <constraint firstItem="mF3-wy-emr" firstAttribute="leading" secondItem="PGL-0T-oay" secondAttribute="leading" id="OxK-rf-Ecd"/>
                             <constraint firstItem="63V-g7-HmS" firstAttribute="trailing" secondItem="K5c-08-cN8" secondAttribute="trailing" id="QV0-Oi-Aqj"/>
                             <constraint firstItem="RbZ-HM-Yw2" firstAttribute="trailing" secondItem="63V-g7-HmS" secondAttribute="trailing" id="Uwx-9G-dCv"/>
                             <constraint firstItem="UsX-bA-LJC" firstAttribute="leading" secondItem="2SW-hE-jGz" secondAttribute="leading" id="VUX-UD-ufc"/>
                             <constraint firstItem="63V-g7-HmS" firstAttribute="top" secondItem="K5c-08-cN8" secondAttribute="bottom" constant="12" id="VUy-Kh-wAo"/>
+                            <constraint firstItem="PGL-0T-oay" firstAttribute="top" secondItem="UsX-bA-LJC" secondAttribute="bottom" constant="10" id="Yr0-IG-Qi0"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="SrI-kb-2sA" secondAttribute="trailing" constant="16" id="aas-bd-doe"/>
+                            <constraint firstItem="mF3-wy-emr" firstAttribute="trailing" secondItem="PGL-0T-oay" secondAttribute="trailing" id="bM3-fc-Xzz"/>
+                            <constraint firstItem="mF3-wy-emr" firstAttribute="top" secondItem="PGL-0T-oay" secondAttribute="bottom" constant="12" id="fGG-Qd-YzO"/>
                             <constraint firstItem="RbZ-HM-Yw2" firstAttribute="top" secondItem="63V-g7-HmS" secondAttribute="bottom" constant="12" id="g10-tA-Wdd"/>
                             <constraint firstItem="RbZ-HM-Yw2" firstAttribute="leading" secondItem="63V-g7-HmS" secondAttribute="leading" id="oj9-Cm-ANG"/>
                             <constraint firstItem="b0A-On-pwl" firstAttribute="trailing" secondItem="SrI-kb-2sA" secondAttribute="trailing" id="qJu-Ie-02u"/>
                             <constraint firstItem="UsX-bA-LJC" firstAttribute="trailing" secondItem="2SW-hE-jGz" secondAttribute="trailing" id="y1j-0h-dNy"/>
+                            <constraint firstItem="PGL-0T-oay" firstAttribute="trailing" secondItem="UsX-bA-LJC" secondAttribute="trailing" id="yao-Ll-av7"/>
                             <constraint firstItem="K5c-08-cN8" firstAttribute="leading" secondItem="b0A-On-pwl" secondAttribute="leading" id="zqp-5q-Fh3"/>
                         </constraints>
                     </view>

@@ -53,7 +53,7 @@ class HomeVC: UIViewController, UIDocumentPickerDelegate {
         DocumentPickerHelper.openDoc(type: .pptx, from: self) { selectedURL in
             if let url = selectedURL {
                 Logger.print("Completion URL: \(url)", level: .success)
-                NavigationManager.shared.navigateToDocViewVC(from: self, url: url, type: "PPT")
+                NavigationManager.shared.navigateToDocViewVC(from: self, url: url, type: "PPTX")
             }
         }
     }
@@ -65,6 +65,24 @@ class HomeVC: UIViewController, UIDocumentPickerDelegate {
                 NavigationManager.shared.navigateToDocViewVC(from: self, url: url, type: "PDF_IMG")
             }
             
+        }
+    }
+    
+    @IBAction func onTapped_PDFto_DOC(_ sender: Any) {
+        DocumentPickerHelper.openDoc(type: .pdf, from: self) { selectedURL in
+            if let url = selectedURL {
+                Logger.print("Completion URL: \(url)", level: .success)
+                NavigationManager.shared.navigateToDocViewVC(from: self, url: url, type: "PDF_DOC")
+            }
+        }
+    }
+    
+    @IBAction func onTapped_PDFto_PPT(_ sender: Any) {
+        DocumentPickerHelper.openDoc(type: .pdf, from: self) { selectedURL in
+            if let url = selectedURL {
+                Logger.print("Completion URL: \(url)", level: .success)
+                NavigationManager.shared.navigateToDocViewVC(from: self, url: url, type: "PDF_PPTX")
+            }
         }
     }
     

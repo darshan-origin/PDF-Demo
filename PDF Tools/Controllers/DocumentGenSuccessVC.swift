@@ -14,6 +14,7 @@ class DocumentGenSuccessVC: UIViewController {
     @IBOutlet weak var lbl_pdfName: UILabel!
     
     var pdfURL = ""
+    let previewManager = PreviewManager()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -22,11 +23,15 @@ class DocumentGenSuccessVC: UIViewController {
     }
     
     @IBAction func onTapped_open(_ sender: Any) {
-        let previewVC = PDFViewVC(url: URL(string: pdfURL)!)
-        let nav = UINavigationController(rootViewController: previewVC)
-        nav.modalPresentationStyle = .fullScreen
-        present(nav, animated: true)
-
+        guard let url = URL(string: pdfURL) else { return }
+        if url.pathExtension.lowercased() == "pdf" {
+            let previewVC = PDFViewVC(url: url)
+            let nav = UINavigationController(rootViewController: previewVC)
+            nav.modalPresentationStyle = .fullScreen
+            present(nav, animated: true)
+        } else {
+            previewManager.showPreview(from: self, with: url)
+        }
     }
     
     @IBAction func onTapped_share(_ sender: Any) {
@@ -49,16 +54,20 @@ extension DocumentGenSuccessVC {
     
     func generateThumbnail() {
         ThreadManager.shared.main { [self] in
-            if let url = URL(string: pdfURL) {
-                let size = CGSize(width: 1024, height: 1024)
+            guard let url = URL(string: pdfURL) else { return }
+            let size = CGSize(width: 1024, height: 1024)
+            
+            if url.pathExtension.lowercased() == "pdf" {
                 DOCHelper.shared.generatePdfThumbnailFromUrl(pdfUrl: url, thumbnailSize: size) { thumbnailImage in
                     if let thumbnail = thumbnailImage {
-                        Logger.print("Thumbnail generated successfully!", level: .success)
                         self.img_thumbImage.image = thumbnail
-                    } else {
-                        Logger.print("Failed to generate thumbnail.", level: .error)
                     }
                 }
+            } else if url.pathExtension.lowercased() == "docx" || url.pathExtension.lowercased() == "pptx" {
+                // For DOCX/PPTX, showing a generic icon
+                self.img_thumbImage.image = UIImage(systemName: url.pathExtension.lowercased() == "pptx" ? "doc.richtext.fill" : "doc.text.fill")
+                self.img_thumbImage.tintColor = url.pathExtension.lowercased() == "pptx" ? .systemOrange : .systemBlue
+                self.img_thumbImage.contentMode = .scaleAspectFit
             }
         }
     }

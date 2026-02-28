@@ -25,12 +25,14 @@ class SelectedDocViewerVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         lbl_selectedFileName.text = fileURL?.lastPathComponent
-        if type == "PDF_IMG" { btn_save.setTitle("Make PPT", for: .normal) }
+        if type == "PDF_IMG" { btn_save.setTitle("Make IMAGES", for: .normal) }
+        if type == "PDF_DOC" { btn_save.setTitle("Make DOCX", for: .normal) }
+        if type == "PDF_PPTX" { btn_save.setTitle("Make PPTX", for: .normal) }
         
         switch type {
         case "TXT": if let t = DOCHelper.shared.readTextFile(from: fileURL!) { txtView_txtFileViewer.text = t }
         case "XLSX": try? extractedTableData = DOCHelper.shared.extractXLSXData(fileURL: fileURL!)
-        case "DOCX", "PPT", "PDF_IMG": previewManager.showPreview(from: self, with: fileURL!)
+        case "DOCX", "PPTX", "PDF_IMG", "PDF_DOC", "PDF_PPTX": previewManager.showPreview(from: self, with: fileURL!)
         default: break
         }
     }
@@ -42,8 +44,10 @@ class SelectedDocViewerVC: UIViewController {
         case "TXT": generatePDFfromTXT()
         case "XLSX": generatePDFfromXLSX()
         case "DOCX": generatePDFfromDOCX()
-        case "PPT": generatePPTToPDF()
+        case "PPTX": generatePPTToPDF()
         case "PDF_IMG": convertPDFToImages()
+        case "PDF_DOC": generatePDFToDOCX()
+        case "PDF_PPTX": generatePDFToPPTX()
         default: break
         }
     }
@@ -64,18 +68,85 @@ extension SelectedDocViewerVC {
     }
     
     func convertPDFToImages() {
+        LoaderView.shared.show(on: self.view)
         ThreadManager.shared.background {
             if FileStorageManager.saveImagesToDocuments(images: DOCHelper.shared.convertPDFToImages(pdfURL: self.fileURL!)) != nil {
-                ThreadManager.shared.main { NavigationManager.shared.popROOTViewController(from: self) }
+                ThreadManager.shared.main {
+                    LoaderView.shared.hide()
+                    NavigationManager.shared.popROOTViewController(from: self)
+                }
+            } else {
+                ThreadManager.shared.main { LoaderView.shared.hide() }
             }
         }
     }
 
     private func performAction(_ action: @escaping () -> Data?) {
+        LoaderView.shared.show(on: self.view)
         ThreadManager.shared.background {
-            guard let data = action() else { return }
-            ThreadManager.shared.main { self.saveAndOpenPDF(data) }
+            guard let data = action() else {
+                ThreadManager.shared.main { LoaderView.shared.hide() }
+                return
+            }
+            ThreadManager.shared.main {
+                LoaderView.shared.hide()
+                self.saveAndOpenPDF(data)
+            }
         }
+    }
+
+    func generatePDFToDOCX() {
+        performActionIntoDOCX { DOCHelper.shared.generateDOCXFromPDF(at: self.fileURL!) }
+    }
+
+    private func performActionIntoDOCX(_ action: @escaping () -> Data?) {
+        LoaderView.shared.show(on: self.view)
+        ThreadManager.shared.background {
+            guard let data = action() else {
+                ThreadManager.shared.main { LoaderView.shared.hide() }
+                return
+            }
+            ThreadManager.shared.main {
+                LoaderView.shared.hide()
+                self.saveAndOpenDOCX(data)
+            }
+        }
+    }
+
+    func saveAndOpenDOCX(_ data: Data) {
+        let name = "\(DOCHelper.shared.getCustomFormattedDateTime()).docx"
+        do {
+            try FileStorageManager.store(data, at: name, in: .documents)
+            let url = FileStorageManager.url(for: name, in: .documents)
+            NavigationManager.shared.navigateToPDFViewVC(from: self, url: "\(url)")
+        } catch { Logger.print("Save failed: \(error)", level: .error) }
+    }
+
+    func generatePDFToPPTX() {
+        performActionIntoPPTX { DOCHelper.shared.generatePPTXFromPDF(at: self.fileURL!) }
+    }
+
+    private func performActionIntoPPTX(_ action: @escaping () -> Data?) {
+        LoaderView.shared.show(on: self.view)
+        ThreadManager.shared.background {
+            guard let data = action() else {
+                ThreadManager.shared.main { LoaderView.shared.hide() }
+                return
+            }
+            ThreadManager.shared.main {
+                LoaderView.shared.hide()
+                self.saveAndOpenPPTX(data)
+            }
+        }
+    }
+
+    func saveAndOpenPPTX(_ data: Data) {
+        let name = "\(DOCHelper.shared.getCustomFormattedDateTime()).pptx"
+        do {
+            try FileStorageManager.store(data, at: name, in: .documents)
+            let url = FileStorageManager.url(for: name, in: .documents)
+            NavigationManager.shared.navigateToPDFViewVC(from: self, url: "\(url)")
+        } catch { Logger.print("Save failed: \(error)", level: .error) }
     }
 
     func saveAndOpenPDF(_ data: Data) {
@@ -92,6 +163,7 @@ extension SelectedDocViewerVC {
     
     func generatePDFfromDOCX() {
         guard let url = fileURL else { return }
+        LoaderView.shared.show(on: self.view)
         let isScoped = url.startAccessingSecurityScopedResource()
         if let data = try? Data(contentsOf: url) {
             if isScoped { url.stopAccessingSecurityScopedResource() }
@@ -100,11 +172,17 @@ extension SelectedDocViewerVC {
             webView?.removeFromSuperview()
             let wv = WKWebView(frame: view.bounds); wv.navigationDelegate = self; wv.alpha = 0.01
             view.addSubview(wv); self.webView = wv; wv.load(URLRequest(url: localURL))
-        } else if isScoped { url.stopAccessingSecurityScopedResource() }
+        } else {
+            if isScoped { url.stopAccessingSecurityScopedResource() }
+            LoaderView.shared.hide()
+        }
     }
 
     private func createMultiPagePDF() {
-        guard let wv = webView else { return }
+        guard let wv = webView else {
+            LoaderView.shared.hide()
+            return
+        }
         let pageRect = CGRect(x: 0, y: 0, width: 612, height: 792), renderer = UIPrintPageRenderer()
         renderer.addPrintFormatter(wv.viewPrintFormatter(), startingAtPageAt: 0)
         renderer.setValue(NSValue(cgRect: pageRect), forKey: "paperRect")
@@ -113,6 +191,7 @@ extension SelectedDocViewerVC {
         UIGraphicsBeginPDFContextToData(data, pageRect, nil)
         for i in 0..<renderer.numberOfPages { UIGraphicsBeginPDFPage(); renderer.drawPage(at: i, in: pageRect) }
         UIGraphicsEndPDFContext(); wv.removeFromSuperview(); self.webView = nil
+        LoaderView.shared.hide()
         saveAndOpenPDF(data as Data)
     }
 }
@@ -126,10 +205,12 @@ extension SelectedDocViewerVC: WKNavigationDelegate {
     }
     
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        LoaderView.shared.hide()
         Logger.print("Navigation failed: \(error.localizedDescription)", level: .error)
     }
     
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        LoaderView.shared.hide()
         Logger.print("Provisional failure: \(error.localizedDescription)", level: .error)
     }
 }
